@@ -2,10 +2,8 @@
 
 
 
-  
 
-
-<html class="theme-next mist use-motion" lang="zh-Hans">
+<html class="theme-next gemini" lang="zh-Hans">
 <head><meta name="generator" content="Hexo 3.9.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -45,6 +43,38 @@
 
 
 
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Fira Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
 
 
 
@@ -68,7 +98,7 @@
 
 
 
-  <meta name="keywords" content="Spring,">
+  <meta name="keywords" content="Spring,Bean,生命周期,">
 
 
 
@@ -80,7 +110,7 @@
 
 
 <meta name="description" content="在Spring体系中，对象的实例（Bean）都是交给Spring容器进行管理的，但是对于Bean在Spring中是创建及销毁流程，很多人都只有一个模糊的概念，今天我们就来认真地探寻一下Bean生命周期的问题。 生命周期图首先，给大家晒上一张我画的生命周期图，当然这并不是完整的流程，像 InstantiationAwareBeanPostProcessor 里面的 postProcessProper">
-<meta name="keywords" content="Spring">
+<meta name="keywords" content="Spring,Bean,生命周期">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Bean生命周期(一)  浅尝知味">
 <meta property="og:url" content="http://qchery.github.io/2019/10/01/Bean生命周期(一) 浅尝知味/index.html">
@@ -88,7 +118,7 @@
 <meta property="og:description" content="在Spring体系中，对象的实例（Bean）都是交给Spring容器进行管理的，但是对于Bean在Spring中是创建及销毁流程，很多人都只有一个模糊的概念，今天我们就来认真地探寻一下Bean生命周期的问题。 生命周期图首先，给大家晒上一张我画的生命周期图，当然这并不是完整的流程，像 InstantiationAwareBeanPostProcessor 里面的 postProcessProper">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/Spring%20Bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.2019-10-01%2017-49-38.png">
-<meta property="og:updated_time" content="2019-10-02T03:32:17.000Z">
+<meta property="og:updated_time" content="2019-10-12T14:38:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bean生命周期(一)  浅尝知味">
 <meta name="twitter:description" content="在Spring体系中，对象的实例（Bean）都是交给Spring容器进行管理的，但是对于Bean在Spring中是创建及销毁流程，很多人都只有一个模糊的概念，今天我们就来认真地探寻一下Bean生命周期的问题。 生命周期图首先，给大家晒上一张我画的生命周期图，当然这并不是完整的流程，像 InstantiationAwareBeanPostProcessor 里面的 postProcessProper">
@@ -100,12 +130,12 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Mist',
+    scheme: 'Gemini',
     version: '5.1.4',
-    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
     tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     duoshuo: {
       userId: '0',
       author: '博主'
@@ -193,6 +223,26 @@
         </li>
       
         
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
@@ -274,6 +324,28 @@
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -363,6 +435,14 @@
     
 
     
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="qchery wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
 
     
 
@@ -373,6 +453,10 @@
         <div class="post-tags">
           
             <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/Bean/" rel="tag"># Bean</a>
+          
+            <a href="/tags/生命周期/" rel="tag"># 生命周期</a>
           
         </div>
       
@@ -460,7 +544,7 @@
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
               <p class="site-author-name" itemprop="name">qchery</p>
-              <p class="site-description motion-element" itemprop="description"></p>
+              <p class="site-description motion-element" itemprop="description">一个金融IT的技术笔记</p>
           </div>
 
           <nav class="site-state motion-element">
@@ -477,15 +561,24 @@
             
 
             
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
 
             
               
               
               <div class="site-state-item site-state-tags">
-                
-                  <span class="site-state-item-count">2</span>
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">标签</span>
-                
+                </a>
               </div>
             
 
@@ -493,6 +586,22 @@
 
           
 
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/qchery" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:chinrui1016@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
           
 
           
@@ -554,7 +663,7 @@
 
 
 
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
 
 
 
@@ -601,6 +710,8 @@
   
 
 
+  
+
 
 
 
@@ -641,6 +752,11 @@
     <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
   
 
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
 
   
 
@@ -653,6 +769,13 @@
 
   
   
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
 
   
   <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
