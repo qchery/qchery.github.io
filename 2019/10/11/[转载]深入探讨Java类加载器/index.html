@@ -118,7 +118,7 @@
 <meta property="og:description" content="转自： https://www.ibm.com/developerworks/cn/java/j-lo-classloader/  类加载器是 Java 语言的一个创新，也是 Java 语言流行的重要原因之一。它使得 Java 类可以被动态加载到 Java 虚拟机中并执行。类加载器从 JDK 1.0 就出现了，最初是为了满足 Java Applet 的需要而开发出来的。Java Applet 需">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/11/01_classloader_struct.jpg">
-<meta property="og:updated_time" content="2019-10-12T14:38:37.000Z">
+<meta property="og:updated_time" content="2019-10-15T14:47:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入探讨Java类加载器">
 <meta name="twitter:description" content="转自： https://www.ibm.com/developerworks/cn/java/j-lo-classloader/  类加载器是 Java 语言的一个创新，也是 Java 语言流行的重要原因之一。它使得 Java 类可以被动态加载到 Java 虚拟机中并执行。类加载器从 JDK 1.0 就出现了，最初是为了满足 Java Applet 的需要而开发出来的。Java Applet 需">
@@ -350,9 +350,30 @@
 
           
             
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/10/11/[转载]深入探讨Java类加载器/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/10/11/[转载]深入探讨Java类加载器/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
           
 
           
+          
+             <span id="/2019/10/11/[转载]深入探讨Java类加载器/" class="leancloud_visitors" data-flag-title="深入探讨Java类加载器">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
           
 
           
@@ -383,7 +404,8 @@
 <h2 id="类加载器基本概念"><a href="#类加载器基本概念" class="headerlink" title="类加载器基本概念"></a>类加载器基本概念</h2><p>顾名思义，类加载器（class loader）用来加载 Java 类到 Java 虚拟机中。一般来说，Java 虚拟机使用 Java 类的方式如下：Java 源程序（.java 文件）在经过 Java 编译器编译之后就被转换成 Java 字节代码（.class 文件）。类加载器负责读取 Java 字节代码，并转换成 <code>java.lang.Class</code>类的一个实例。每个这样的实例用来表示一个 Java 类。通过此实例的 <code>newInstance()</code>方法就可以创建出该类的一个对象。实际的情况可能更加复杂，比如 Java 字节代码可能是通过工具动态生成的，也可能是通过网络下载的。</p>
 <p>基本上所有的类加载器都是 <code>java.lang.ClassLoader</code>类的一个实例。下面详细介绍这个 Java 类。</p>
 <h3 id="java-lang-ClassLoader类介绍"><a href="#java-lang-ClassLoader类介绍" class="headerlink" title="java.lang.ClassLoader类介绍"></a><code>java.lang.ClassLoader</code>类介绍</h3><p><code>java.lang.ClassLoader</code>类的基本职责就是根据一个指定的类的名称，找到或者生成其对应的字节代码，然后从这些字节代码中定义出一个 Java 类，即 <code>java.lang.Class</code>类的一个实例。除此之外，<code>ClassLoader</code>还负责加载 Java 应用所需的资源，如图像文件和配置文件等。不过本文只讨论其加载类的功能。为了完成加载类的这个职责，<code>ClassLoader</code>提供了一系列的方法，比较重要的方法如 <a href="#minor1.1">表 1</a>所示。关于这些方法的细节会在下面进行介绍。</p>
-<h5 id="表-1-ClassLoader-中与加载类相关的方法"><a href="#表-1-ClassLoader-中与加载类相关的方法" class="headerlink" title="表 1. ClassLoader 中与加载类相关的方法"></a><span id="minor1.1">表 1. ClassLoader 中与加载类相关的方法</span></h5><table>
+<p><span id="minor1.1"><strong>表 1. ClassLoader 中与加载类相关的方法</strong></span></p>
+<table>
 <thead>
 <tr>
 <th align="left">方法</th>
@@ -424,23 +446,29 @@
 </ul>
 <p>除了系统提供的类加载器以外，开发人员可以通过继承 <code>java.lang.ClassLoader</code>类的方式实现自己的类加载器，以满足一些特殊的需求。</p>
 <p>除了引导类加载器之外，所有的类加载器都有一个父类加载器。通过 <a href="#minor1.1">表 1</a>中给出的 <code>getParent()</code>方法可以得到。对于系统提供的类加载器来说，系统类加载器的父类加载器是扩展类加载器，而扩展类加载器的父类加载器是引导类加载器；对于开发人员编写的类加载器来说，其父类加载器是加载此类加载器 Java 类的类加载器。因为类加载器 Java 类如同其它的 Java 类一样，也是要由类加载器来加载的。一般来说，开发人员编写的类加载器的父类加载器是系统类加载器。类加载器通过这种方式组织起来，形成树状结构。树的根节点就是引导类加载器。<a href="#fig1">图 1</a>中给出了一个典型的类加载器树状组织结构示意图，其中的箭头指向的是父类加载器。</p>
-<h5 id="图-1-类加载器树状组织结构示意图"><a href="#图-1-类加载器树状组织结构示意图" class="headerlink" title="图 1. 类加载器树状组织结构示意图"></a><span id="fig1">图 1. 类加载器树状组织结构示意图<span></span></span></h5><p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/11/01_classloader_struct.jpg" alt="类加载器树状组织结构示意图"></p>
+<p><span id="fig1"><strong>图 1. 类加载器树状组织结构示意图</strong></span></p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/11/01_classloader_struct.jpg" alt="类加载器树状组织结构示意图"></p>
 <p><a href="#code1">代码清单 1</a>演示了类加载器的树状组织结构。</p>
-<h5 id="清单-1-演示类加载器的树状组织结构"><a href="#清单-1-演示类加载器的树状组织结构" class="headerlink" title="清单 1. 演示类加载器的树状组织结构"></a><span id="code1">清单 1. 演示类加载器的树状组织结构<span></span></span></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassLoaderTree</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123; </span><br><span class="line">       ClassLoader loader = ClassLoaderTree.class.getClassLoader(); </span><br><span class="line">       <span class="keyword">while</span> (loader != <span class="keyword">null</span>) &#123; </span><br><span class="line">           System.out.println(loader.toString()); </span><br><span class="line">           loader = loader.getParent(); </span><br><span class="line">       &#125; </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><span id="code1"><strong>清单 1. 演示类加载器的树状组织结构</strong></span></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassLoaderTree</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123; </span><br><span class="line">       ClassLoader loader = ClassLoaderTree.class.getClassLoader(); </span><br><span class="line">       <span class="keyword">while</span> (loader != <span class="keyword">null</span>) &#123; </span><br><span class="line">           System.out.println(loader.toString()); </span><br><span class="line">           loader = loader.getParent(); </span><br><span class="line">       &#125; </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>每个 Java 类都维护着一个指向定义它的类加载器的引用，通过 <code>getClassLoader()</code>方法就可以获取到此引用。<a href="#code1">代码清单 1</a>中通过递归调用 <code>getParent()</code>方法来输出全部的父类加载器。<a href="#code1">代码清单 1</a>的运行结果如 <a href="#code2">代码清单 2</a>所示。</p>
-<h5 id="清单-2-演示类加载器的树状组织结构的运行结果"><a href="#清单-2-演示类加载器的树状组织结构的运行结果" class="headerlink" title="清单 2. 演示类加载器的树状组织结构的运行结果"></a><span id="code2">清单 2. 演示类加载器的树状组织结构的运行结果<span></span></span></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sun.misc.Launcher$AppClassLoader@<span class="number">9304</span>b1 </span><br><span class="line">sun.misc.Launcher$ExtClassLoader@<span class="number">190</span>d11</span><br></pre></td></tr></table></figure>
+<p><span id="code2"><strong>清单 2. 演示类加载器的树状组织结构的运行结果</strong></span></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sun.misc.Launcher$AppClassLoader@<span class="number">9304</span>b1 </span><br><span class="line">sun.misc.Launcher$ExtClassLoader@<span class="number">190</span>d11</span><br></pre></td></tr></table></figure>
 
 <p>如 <a href="#code2">代码清单 2</a>所示，第一个输出的是 <code>ClassLoaderTree</code>类的类加载器，即系统类加载器。它是 <code>sun.misc.Launcher$AppClassLoader</code>类的实例；第二个输出的是扩展类加载器，是 <code>sun.misc.Launcher$ExtClassLoader</code>类的实例。需要注意的是这里并没有输出引导类加载器，这是由于有些 JDK 的实现对于父类加载器是引导类加载器的情况，<code>getParent()</code>方法返回 <code>null</code>。</p>
 <p>在了解了类加载器的树状组织结构之后，下面介绍类加载器的代理模式。</p>
 <h3 id="类加载器的代理模式"><a href="#类加载器的代理模式" class="headerlink" title="类加载器的代理模式"></a>类加载器的代理模式</h3><p>类加载器在尝试自己去查找某个类的字节代码并定义它时，会先代理给其父类加载器，由父类加载器先去尝试加载这个类，依次类推。在介绍代理模式背后的动机之前，首先需要说明一下 Java 虚拟机是如何判定两个 Java 类是相同的。Java 虚拟机不仅要看类的全名是否相同，还要看加载此类的类加载器是否一样。只有两者都相同的情况，才认为两个类是相同的。即便是同样的字节代码，被不同的类加载器加载之后所得到的类，也是不同的。比如一个 Java 类 <code>com.example.Sample</code>，编译之后生成了字节代码文件 <code>Sample.class</code>。两个不同的类加载器 <code>ClassLoaderA</code>和 <code>ClassLoaderB</code>分别读取了这个 <code>Sample.class</code>文件，并定义出两个 <code>java.lang.Class</code>类的实例来表示这个类。这两个实例是不相同的。对于 Java 虚拟机来说，它们是不同的类。试图对这两个类的对象进行相互赋值，会抛出运行时异常 <code>ClassCastException</code>。下面通过示例来具体说明。<a href="#code3">代码清单 3</a>中给出了 Java 类 <code>com.example.Sample</code>。</p>
-<h5 id="清单-3-com-example-Sample-类"><a href="#清单-3-com-example-Sample-类" class="headerlink" title="清单 3. com.example.Sample 类"></a><span id="code3">清单 3. com.example.Sample 类<span></span></span></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example; </span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Sample</span> </span>&#123; </span><br><span class="line">   <span class="keyword">private</span> Sample instance; </span><br><span class="line"> </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSample</span><span class="params">(Object instance)</span> </span>&#123; </span><br><span class="line">       <span class="keyword">this</span>.instance = (Sample) instance; </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><span id="code3"><strong>清单 3. com.example.Sample 类</strong></span></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example; </span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Sample</span> </span>&#123; </span><br><span class="line">   <span class="keyword">private</span> Sample instance; </span><br><span class="line"> </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSample</span><span class="params">(Object instance)</span> </span>&#123; </span><br><span class="line">       <span class="keyword">this</span>.instance = (Sample) instance; </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>如 <a href="#code3">代码清单 3</a>所示，<code>com.example.Sample</code>类的方法 <code>setSample</code>接受一个 <code>java.lang.Object</code>类型的参数，并且会把该参数强制转换成 <code>com.example.Sample</code>类型。测试 Java 类是否相同的代码如 <a href="#code4">代码清单 4</a>所示。</p>
-<h5 id="清单-4-测试-Java-类是否相同"><a href="#清单-4-测试-Java-类是否相同" class="headerlink" title="清单 4. 测试 Java 类是否相同"></a><span id="code4">清单 4. 测试 Java 类是否相同<span></span></span></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testClassIdentity</span><span class="params">()</span> </span>&#123; </span><br><span class="line">   String classDataRootPath = <span class="string">"C:\\workspace\\Classloader\\classData"</span>; </span><br><span class="line">   FileSystemClassLoader fscl1 = <span class="keyword">new</span> FileSystemClassLoader(classDataRootPath); </span><br><span class="line">   FileSystemClassLoader fscl2 = <span class="keyword">new</span> FileSystemClassLoader(classDataRootPath); </span><br><span class="line">   String className = <span class="string">"com.example.Sample"</span>;    </span><br><span class="line">   <span class="keyword">try</span> &#123; </span><br><span class="line">       Class&lt;?&gt; class1 = fscl1.loadClass(className); </span><br><span class="line">       Object obj1 = class1.newInstance(); </span><br><span class="line">       Class&lt;?&gt; class2 = fscl2.loadClass(className); </span><br><span class="line">       Object obj2 = class2.newInstance(); </span><br><span class="line">       Method setSampleMethod = class1.getMethod(<span class="string">"setSample"</span>, java.lang.Object.class); </span><br><span class="line">       setSampleMethod.invoke(obj1, obj2); </span><br><span class="line">   &#125; <span class="keyword">catch</span> (Exception e) &#123; </span><br><span class="line">       e.printStackTrace(); </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><span id="code4"><strong>清单 4. 测试 Java 类是否相同</strong></span></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testClassIdentity</span><span class="params">()</span> </span>&#123; </span><br><span class="line">   String classDataRootPath = <span class="string">"C:\\workspace\\Classloader\\classData"</span>; </span><br><span class="line">   FileSystemClassLoader fscl1 = <span class="keyword">new</span> FileSystemClassLoader(classDataRootPath); </span><br><span class="line">   FileSystemClassLoader fscl2 = <span class="keyword">new</span> FileSystemClassLoader(classDataRootPath); </span><br><span class="line">   String className = <span class="string">"com.example.Sample"</span>;    </span><br><span class="line">   <span class="keyword">try</span> &#123; </span><br><span class="line">       Class&lt;?&gt; class1 = fscl1.loadClass(className); </span><br><span class="line">       Object obj1 = class1.newInstance(); </span><br><span class="line">       Class&lt;?&gt; class2 = fscl2.loadClass(className); </span><br><span class="line">       Object obj2 = class2.newInstance(); </span><br><span class="line">       Method setSampleMethod = class1.getMethod(<span class="string">"setSample"</span>, java.lang.Object.class); </span><br><span class="line">       setSampleMethod.invoke(obj1, obj2); </span><br><span class="line">   &#125; <span class="keyword">catch</span> (Exception e) &#123; </span><br><span class="line">       e.printStackTrace(); </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p><a href="#code4">代码清单 4</a>中使用了类 <code>FileSystemClassLoader</code>的两个不同实例来分别加载类 <code>com.example.Sample</code>，得到了两个不同的 <code>java.lang.Class</code>的实例，接着通过 <code>newInstance()</code>方法分别生成了两个类的对象 <code>obj1</code>和 <code>obj2</code>，最后通过 Java 的反射 API 在对象 <code>obj1</code>上调用方法 <code>setSample</code>，试图把对象 <code>obj2</code>赋值给 <code>obj1</code>内部的 <code>instance</code>对象。<a href="#code4">代码清单 4</a>的运行结果如 <a href="#code5">代码清单 5</a>所示。</p>
-<h5 id="清单-5-测试-Java-类是否相同的运行结果"><a href="#清单-5-测试-Java-类是否相同的运行结果" class="headerlink" title="清单 5. 测试 Java 类是否相同的运行结果"></a><span id="code5">清单 5. 测试 Java 类是否相同的运行结果<span></span></span></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">java.lang.reflect.InvocationTargetException </span><br><span class="line">at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) </span><br><span class="line">at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:<span class="number">39</span>) </span><br><span class="line">at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:<span class="number">25</span>)</span><br><span class="line">at java.lang.reflect.Method.invoke(Method.java:<span class="number">597</span>) </span><br><span class="line">at classloader.ClassIdentity.testClassIdentity(ClassIdentity.java:<span class="number">26</span>) </span><br><span class="line">at classloader.ClassIdentity.main(ClassIdentity.java:<span class="number">9</span>) </span><br><span class="line">Caused by: java.lang.ClassCastException: com.example.Sample </span><br><span class="line">cannot be cast to com.example.Sample </span><br><span class="line">at com.example.Sample.setSample(Sample.java:<span class="number">7</span>) </span><br><span class="line">... <span class="number">6</span> more</span><br></pre></td></tr></table></figure>
+<p><span id="code5"><strong>清单 5. 测试 Java 类是否相同的运行结果</strong></span></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">java.lang.reflect.InvocationTargetException </span><br><span class="line">at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) </span><br><span class="line">at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:<span class="number">39</span>) </span><br><span class="line">at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:<span class="number">25</span>)</span><br><span class="line">at java.lang.reflect.Method.invoke(Method.java:<span class="number">597</span>) </span><br><span class="line">at classloader.ClassIdentity.testClassIdentity(ClassIdentity.java:<span class="number">26</span>) </span><br><span class="line">at classloader.ClassIdentity.main(ClassIdentity.java:<span class="number">9</span>) </span><br><span class="line">Caused by: java.lang.ClassCastException: com.example.Sample </span><br><span class="line">cannot be cast to com.example.Sample </span><br><span class="line">at com.example.Sample.setSample(Sample.java:<span class="number">7</span>) </span><br><span class="line">... <span class="number">6</span> more</span><br></pre></td></tr></table></figure>
 
 <p>从 <a href="#code5">代码清单 5</a>给出的运行结果可以看到，运行时抛出了 <code>java.lang.ClassCastException</code>异常。虽然两个对象 <code>obj1</code>和 <code>obj2</code>的类的名字相同，但是这两个类是由不同的类加载器实例来加载的，因此不被 Java 虚拟机认为是相同的。</p>
 <p>了解了这一点之后，就可以理解代理模式的设计动机了。代理模式是为了保证 Java 核心库的类型安全。所有 Java 应用都至少需要引用 <code>java.lang.Object</code>类，也就是说在运行的时候，<code>java.lang.Object</code>这个类需要被加载到 Java 虚拟机中。如果这个加载过程由 Java 应用自己的类加载器来完成的话，很可能就存在多个版本的 <code>java.lang.Object</code>类，而且这些类之间是不兼容的。通过代理模式，对于 Java 核心库的类的加载工作由引导类加载器来统一完成，保证了 Java 应用所使用的都是同一个版本的 Java 核心库的类，是互相兼容的。</p>
@@ -458,7 +486,8 @@
 <p>在介绍完类加载器相关的基本概念之后，下面介绍如何开发自己的类加载器。</p>
 <h2 id="开发自己的类加载器"><a href="#开发自己的类加载器" class="headerlink" title="开发自己的类加载器"></a>开发自己的类加载器</h2><p>虽然在绝大多数情况下，系统默认提供的类加载器实现已经可以满足需求。但是在某些情况下，您还是需要为应用开发出自己的类加载器。比如您的应用通过网络来传输 Java 类的字节代码，为了保证安全性，这些字节代码经过了加密处理。这个时候您就需要自己的类加载器来从某个网络地址上读取加密后的字节代码，接着进行解密和验证，最后定义出要在 Java 虚拟机中运行的类来。下面将通过两个具体的实例来说明类加载器的开发。</p>
 <h3 id="文件系统类加载器"><a href="#文件系统类加载器" class="headerlink" title="文件系统类加载器"></a>文件系统类加载器</h3><p>第一个类加载器用来加载存储在文件系统上的 Java 字节代码。完整的实现如 <a href="#code6">代码清单 6</a>所示。</p>
-<h5 id="清单-6-文件系统类加载器"><a href="#清单-6-文件系统类加载器" class="headerlink" title="清单 6. 文件系统类加载器"></a><span id="code6">清单 6. 文件系统类加载器<span></span></span></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FileSystemClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123; </span><br><span class="line"> </span><br><span class="line">   <span class="keyword">private</span> String rootDir; </span><br><span class="line"> </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">FileSystemClassLoader</span><span class="params">(String rootDir)</span> </span>&#123; </span><br><span class="line">       <span class="keyword">this</span>.rootDir = rootDir; </span><br><span class="line">   &#125; </span><br><span class="line"> </span><br><span class="line">   <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123; </span><br><span class="line">       <span class="keyword">byte</span>[] classData = getClassData(name); </span><br><span class="line">       <span class="keyword">if</span> (classData == <span class="keyword">null</span>) &#123; </span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(); </span><br><span class="line">       &#125; </span><br><span class="line">       <span class="keyword">else</span> &#123; </span><br><span class="line">           <span class="keyword">return</span> defineClass(name, classData, <span class="number">0</span>, classData.length); </span><br><span class="line">       &#125; </span><br><span class="line">   &#125; </span><br><span class="line"> </span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">byte</span>[] getClassData(String className) &#123; </span><br><span class="line">       String path = classNameToPath(className); </span><br><span class="line">       <span class="keyword">try</span> &#123; </span><br><span class="line">           InputStream ins = <span class="keyword">new</span> FileInputStream(path); </span><br><span class="line">           ByteArrayOutputStream baos = <span class="keyword">new</span> ByteArrayOutputStream(); </span><br><span class="line">           <span class="keyword">int</span> bufferSize = <span class="number">4096</span>; </span><br><span class="line">           <span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[bufferSize]; </span><br><span class="line">           <span class="keyword">int</span> bytesNumRead = <span class="number">0</span>; </span><br><span class="line">           <span class="keyword">while</span> ((bytesNumRead = ins.read(buffer)) != -<span class="number">1</span>) &#123; </span><br><span class="line">               baos.write(buffer, <span class="number">0</span>, bytesNumRead); </span><br><span class="line">           &#125; </span><br><span class="line">           <span class="keyword">return</span> baos.toByteArray(); </span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException e) &#123; </span><br><span class="line">           e.printStackTrace(); </span><br><span class="line">       &#125; </span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">null</span>; </span><br><span class="line">   &#125; </span><br><span class="line"> </span><br><span class="line">   <span class="function"><span class="keyword">private</span> String <span class="title">classNameToPath</span><span class="params">(String className)</span> </span>&#123; </span><br><span class="line">       <span class="keyword">return</span> rootDir + File.separatorChar </span><br><span class="line">               + className.replace(<span class="string">'.'</span>, File.separatorChar) + <span class="string">".class"</span>; </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><span id="code6"><strong>清单 6. 文件系统类加载器</strong></span></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FileSystemClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123; </span><br><span class="line"> </span><br><span class="line">   <span class="keyword">private</span> String rootDir; </span><br><span class="line"> </span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="title">FileSystemClassLoader</span><span class="params">(String rootDir)</span> </span>&#123; </span><br><span class="line">       <span class="keyword">this</span>.rootDir = rootDir; </span><br><span class="line">   &#125; </span><br><span class="line"> </span><br><span class="line">   <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123; </span><br><span class="line">       <span class="keyword">byte</span>[] classData = getClassData(name); </span><br><span class="line">       <span class="keyword">if</span> (classData == <span class="keyword">null</span>) &#123; </span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException(); </span><br><span class="line">       &#125; </span><br><span class="line">       <span class="keyword">else</span> &#123; </span><br><span class="line">           <span class="keyword">return</span> defineClass(name, classData, <span class="number">0</span>, classData.length); </span><br><span class="line">       &#125; </span><br><span class="line">   &#125; </span><br><span class="line"> </span><br><span class="line">   <span class="keyword">private</span> <span class="keyword">byte</span>[] getClassData(String className) &#123; </span><br><span class="line">       String path = classNameToPath(className); </span><br><span class="line">       <span class="keyword">try</span> &#123; </span><br><span class="line">           InputStream ins = <span class="keyword">new</span> FileInputStream(path); </span><br><span class="line">           ByteArrayOutputStream baos = <span class="keyword">new</span> ByteArrayOutputStream(); </span><br><span class="line">           <span class="keyword">int</span> bufferSize = <span class="number">4096</span>; </span><br><span class="line">           <span class="keyword">byte</span>[] buffer = <span class="keyword">new</span> <span class="keyword">byte</span>[bufferSize]; </span><br><span class="line">           <span class="keyword">int</span> bytesNumRead = <span class="number">0</span>; </span><br><span class="line">           <span class="keyword">while</span> ((bytesNumRead = ins.read(buffer)) != -<span class="number">1</span>) &#123; </span><br><span class="line">               baos.write(buffer, <span class="number">0</span>, bytesNumRead); </span><br><span class="line">           &#125; </span><br><span class="line">           <span class="keyword">return</span> baos.toByteArray(); </span><br><span class="line">       &#125; <span class="keyword">catch</span> (IOException e) &#123; </span><br><span class="line">           e.printStackTrace(); </span><br><span class="line">       &#125; </span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">null</span>; </span><br><span class="line">   &#125; </span><br><span class="line"> </span><br><span class="line">   <span class="function"><span class="keyword">private</span> String <span class="title">classNameToPath</span><span class="params">(String className)</span> </span>&#123; </span><br><span class="line">       <span class="keyword">return</span> rootDir + File.separatorChar </span><br><span class="line">               + className.replace(<span class="string">'.'</span>, File.separatorChar) + <span class="string">".class"</span>; </span><br><span class="line">   &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>如 <a href="#code6">代码清单 6</a>所示，类 <code>FileSystemClassLoader</code>继承自类 <code>java.lang.ClassLoader</code>。在 <a href="#minor1.1">表 1</a>中列出的 <code>java.lang.ClassLoader</code>类的常用方法中，一般来说，自己开发的类加载器只需要覆写 <code>findClass(String name)</code>方法即可。<code>java.lang.ClassLoader</code>类的方法 <code>loadClass()</code>封装了前面提到的代理模式的实现。该方法会首先调用 <code>findLoadedClass()</code>方法来检查该类是否已经被加载过；如果没有加载过的话，会调用父类加载器的 <code>loadClass()</code>方法来尝试加载该类；如果父类加载器无法加载该类的话，就调用 <code>findClass()</code>方法来查找该类。因此，为了保证类加载器都正确实现代理模式，在开发自己的类加载器时，最好不要覆写 <code>loadClass()</code>方法，而是覆写 <code>findClass()</code>方法。</p>
 <p>类 <code>FileSystemClassLoader</code>的 <code>findClass()</code>方法首先根据类的全名在硬盘上查找类的字节代码文件（.class 文件），然后读取该文件内容，最后通过 <code>defineClass()</code>方法来把这些字节代码转换成 <code>java.lang.Class</code>类的实例。</p>
@@ -502,6 +531,24 @@
 
     
 
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    qchery
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://qchery.github.io/2019/10/11/[转载]深入探讨Java类加载器/" title="深入探讨Java类加载器">http://qchery.github.io/2019/10/11/[转载]深入探讨Java类加载器/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
     
 
     <footer class="post-footer">
@@ -563,6 +610,9 @@
           
 
   
+    <div class="comments" id="comments">
+    </div>
+  
 
 
 
@@ -610,7 +660,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -621,7 +671,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">3</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -632,7 +682,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -681,7 +731,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器基本概念"><span class="nav-number">1.</span> <span class="nav-text">类加载器基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#java-lang-ClassLoader类介绍"><span class="nav-number">1.1.</span> <span class="nav-text">java.lang.ClassLoader类介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#表-1-ClassLoader-中与加载类相关的方法"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">表 1. ClassLoader 中与加载类相关的方法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类加载器的树状组织结构"><span class="nav-number">1.2.</span> <span class="nav-text">类加载器的树状组织结构</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#图-1-类加载器树状组织结构示意图"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">图 1. 类加载器树状组织结构示意图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#清单-1-演示类加载器的树状组织结构"><span class="nav-number">1.2.0.2.</span> <span class="nav-text">清单 1. 演示类加载器的树状组织结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#清单-2-演示类加载器的树状组织结构的运行结果"><span class="nav-number">1.2.0.3.</span> <span class="nav-text">清单 2. 演示类加载器的树状组织结构的运行结果</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#类加载器的代理模式"><span class="nav-number">1.3.</span> <span class="nav-text">类加载器的代理模式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#清单-3-com-example-Sample-类"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">清单 3. com.example.Sample 类</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#清单-4-测试-Java-类是否相同"><span class="nav-number">1.3.0.2.</span> <span class="nav-text">清单 4. 测试 Java 类是否相同</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#清单-5-测试-Java-类是否相同的运行结果"><span class="nav-number">1.3.0.3.</span> <span class="nav-text">清单 5. 测试 Java 类是否相同的运行结果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载类的过程"><span class="nav-number">1.4.</span> <span class="nav-text">加载类的过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程上下文类加载器"><span class="nav-number">1.5.</span> <span class="nav-text">线程上下文类加载器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Class-forName"><span class="nav-number">1.6.</span> <span class="nav-text">Class.forName</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发自己的类加载器"><span class="nav-number">2.</span> <span class="nav-text">开发自己的类加载器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文件系统类加载器"><span class="nav-number">2.1.</span> <span class="nav-text">文件系统类加载器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#清单-6-文件系统类加载器"><span class="nav-number">2.1.0.1.</span> <span class="nav-text">清单 6. 文件系统类加载器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络类加载器"><span class="nav-number">2.2.</span> <span class="nav-text">网络类加载器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器与-Web-容器"><span class="nav-number">3.</span> <span class="nav-text">类加载器与 Web 容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器与-OSGi"><span class="nav-number">4.</span> <span class="nav-text">类加载器与 OSGi</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器基本概念"><span class="nav-number">1.</span> <span class="nav-text">类加载器基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#java-lang-ClassLoader类介绍"><span class="nav-number">1.1.</span> <span class="nav-text">java.lang.ClassLoader类介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类加载器的树状组织结构"><span class="nav-number">1.2.</span> <span class="nav-text">类加载器的树状组织结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#类加载器的代理模式"><span class="nav-number">1.3.</span> <span class="nav-text">类加载器的代理模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载类的过程"><span class="nav-number">1.4.</span> <span class="nav-text">加载类的过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程上下文类加载器"><span class="nav-number">1.5.</span> <span class="nav-text">线程上下文类加载器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Class-forName"><span class="nav-number">1.6.</span> <span class="nav-text">Class.forName</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发自己的类加载器"><span class="nav-number">2.</span> <span class="nav-text">开发自己的类加载器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文件系统类加载器"><span class="nav-number">2.1.</span> <span class="nav-text">文件系统类加载器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络类加载器"><span class="nav-number">2.2.</span> <span class="nav-text">网络类加载器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器与-Web-容器"><span class="nav-number">3.</span> <span class="nav-text">类加载器与 Web 容器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类加载器与-OSGi"><span class="nav-number">4.</span> <span class="nav-text">类加载器与 OSGi</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
@@ -877,6 +927,28 @@
 
 
 
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz',
+        appKey: 'WrkItEsXn8is88v2tvi0mwbg',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!',
+        avatar:'mp',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
 
 
   
@@ -886,6 +958,113 @@
 
 
   
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz", "WrkItEsXn8is88v2tvi0mwbg");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
 
   
 
