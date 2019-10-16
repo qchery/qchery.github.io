@@ -117,10 +117,12 @@
 <meta property="og:site_name" content="Q码记">
 <meta property="og:description" content="本文主要是以洪泛路由的一个简单模拟，一切都源于一个朋友的请求，所以花了大概两个小时的时间完成了这么一个简单的实现。 不知道大家对洪泛算法有没有过一些了解，总之我在这之前是完全没有听说有这么一个算法存在。如果没有了解过的话，可以参考如下描述（源自百度百科的拷贝）：  洪泛不要求维护网络的拓扑结构和相关的路由计算，仅要求接收到信息的节点以广播方式转发数据包。例如，源节点希望发送一段数据给目标节点。源节">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-10-15T14:47:37.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201605/%E6%B4%AA%E6%B3%9B%E8%B7%AF%E7%94%B1%E6%A1%88%E4%BE%8B.png">
+<meta property="og:updated_time" content="2019-10-16T14:48:02.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="洪泛路由模拟">
 <meta name="twitter:description" content="本文主要是以洪泛路由的一个简单模拟，一切都源于一个朋友的请求，所以花了大概两个小时的时间完成了这么一个简单的实现。 不知道大家对洪泛算法有没有过一些了解，总之我在这之前是完全没有听说有这么一个算法存在。如果没有了解过的话，可以参考如下描述（源自百度百科的拷贝）：  洪泛不要求维护网络的拓扑结构和相关的路由计算，仅要求接收到信息的节点以广播方式转发数据包。例如，源节点希望发送一段数据给目标节点。源节">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201605/%E6%B4%AA%E6%B3%9B%E8%B7%AF%E7%94%B1%E6%A1%88%E4%BE%8B.png">
 
 
 
@@ -408,6 +410,7 @@
 </ol>
 <p>其次，既然是模拟通信，那么我们就必须先要有一份网络拓朴图，下图即为此次我所使用的拓朴图。</p>
 <p>对于实现来说，我们需要对这个图进行抽象化。此次我主要将图抽象为两个对象，一个是节点对象，用于描述图中各主机的关联关系，第二个是报文对象，用于描述传输的数据。</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201605/%E6%B4%AA%E6%B3%9B%E8%B7%AF%E7%94%B1%E6%A1%88%E4%BE%8B.png" alt="洪泛路由模拟"></p>
 <p>对于一个模拟程序来说，我们需要指定一个报文的发出主机与目的主机，而在洪泛算法里，报文每到一个主机后会对与之相邻且未接收过该份报文的主机进行广播，在这里我们需要给一个最大的跳跃次数，即尝试多少次广播后，若还没有到达目标主机，我们会将该份报文丢弃。</p>
 <p>这里，我选用初始节点为：节点1、目标节点为：节点7、最大跳跃次数为3。下面给出相关的代码实现：</p>
 <p>首先，对节点对象的进行封装：</p>
@@ -562,7 +565,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -584,7 +587,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">12</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
