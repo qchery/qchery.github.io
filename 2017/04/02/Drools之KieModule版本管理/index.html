@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next gemini" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Fira Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="源码,Drools,KieModule,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Drools 作为一个优秀的开源规则引擎，它的功能无疑是非常强大的。与普通的规则硬编码相比，Drools 有着非常多的优点，比如：规则的动态更新、规则配置的可视化等。 规则动态更新的简单描述使用或了解过 Drools 的小伙伴们应该知道它里面定义了很多的概念，其中有一个比较重要的就是 KieModule，而 Drools 的规则动态更新也就是基于对 KieModule 地动态加载。由于一般在现实的">
+<meta name="keywords" content="源码,Drools,KieModule">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Drools之KieModule版本管理">
+<meta property="og:url" content="http://qchery.github.io/2017/04/02/Drools之KieModule版本管理/index.html">
+<meta property="og:site_name" content="Q码记">
+<meta property="og:description" content="Drools 作为一个优秀的开源规则引擎，它的功能无疑是非常强大的。与普通的规则硬编码相比，Drools 有着非常多的优点，比如：规则的动态更新、规则配置的可视化等。 规则动态更新的简单描述使用或了解过 Drools 的小伙伴们应该知道它里面定义了很多的概念，其中有一个比较重要的就是 KieModule，而 Drools 的规则动态更新也就是基于对 KieModule 地动态加载。由于一般在现实的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/02/KieRepository%E7%B1%BB%E5%9B%BE.jpg">
+<meta property="og:updated_time" content="2019-10-17T12:50:41.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Drools之KieModule版本管理">
+<meta name="twitter:description" content="Drools 作为一个优秀的开源规则引擎，它的功能无疑是非常强大的。与普通的规则硬编码相比，Drools 有着非常多的优点，比如：规则的动态更新、规则配置的可视化等。 规则动态更新的简单描述使用或了解过 Drools 的小伙伴们应该知道它里面定义了很多的概念，其中有一个比较重要的就是 KieModule，而 Drools 的规则动态更新也就是基于对 KieModule 地动态加载。由于一般在现实的">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/02/KieRepository%E7%B1%BB%E5%9B%BE.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://qchery.github.io/2017/04/02/Drools之KieModule版本管理/">
+
+
+
+
+
+  <title>Drools之KieModule版本管理 | Q码记</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Q码记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">崇尚专注，乐于分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://qchery.github.io/2017/04/02/Drools之KieModule版本管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qchery">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Q码记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Drools之KieModule版本管理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-02T22:35:18+08:00">
+                2017-04-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Drools/" itemprop="url" rel="index">
+                    <span itemprop="name">Drools</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/04/02/Drools之KieModule版本管理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2017/04/02/Drools之KieModule版本管理/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2017/04/02/Drools之KieModule版本管理/" class="leancloud_visitors" data-flag-title="Drools之KieModule版本管理">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Drools 作为一个优秀的开源规则引擎，它的功能无疑是非常强大的。与普通的规则硬编码相比，Drools 有着非常多的优点，比如：规则的动态更新、规则配置的可视化等。</p>
+<h2 id="规则动态更新的简单描述"><a href="#规则动态更新的简单描述" class="headerlink" title="规则动态更新的简单描述"></a>规则动态更新的简单描述</h2><p>使用或了解过 Drools 的小伙伴们应该知道它里面定义了很多的概念，其中有一个比较重要的就是 <code>KieModule</code>，而 Drools 的规则动态更新也就是基于对 <code>KieModule</code> 地动态加载。由于一般在现实的使用场景中，规则内容都会被打包成一个 Jar 文件，然后由 <code>KieScanner</code> 根据 Jar 的 GAV（groupId/artifactId/version） 对其进行扫描加载，从而实现规则的动态更新。那么 Drools 是怎样根据 GAV 来控制规则的版本管理的呢？</p>
+<a id="more"></a>
+
+<h2 id="KieModule-仓库"><a href="#KieModule-仓库" class="headerlink" title="KieModule 仓库"></a>KieModule 仓库</h2><p>在 Drools 里面，规则包是强依赖于 Maven 的，规则管理的抽象模型也与其基本一致，与 Maven 的 jar 仓库类似，Drools 也有着自己的仓库对 <code>KieModule</code> 进行管理，当然，Drools 的仓库只是程序代码中一个概念。</p>
+<p>Drools 的仓库非常简单，首先，我们来看一下仓库相关的类图：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/02/KieRepository%E7%B1%BB%E5%9B%BE.jpg" alt="这里写图片描述"></p>
+<p>类的层次结构非常简单，一个接口，一个实现类，就完成了整个对 <code>KieModule</code> 的管理，当然只限于 <code>KieModule</code>，不包含其里面的 <code>KieBase</code>、<code>KieSession</code> 之类的。</p>
+<p>而对于 <code>KieModule</code> 的管理，所有的操作也只有三种：添加(<code>addKieModule</code>)、删除(<code>removeKieModule</code>)、获取(<code>getKieModule</code>)。而这三类操作却全部委派给 <code>KieRepositoryImpl.KieModuleRepo</code> 这个内部类来完成了，这个类将是我们学习的重点。</p>
+<h3 id="KieModuleRepo-的属性设置"><a href="#KieModuleRepo-的属性设置" class="headerlink" title="KieModuleRepo 的属性设置"></a>KieModuleRepo 的属性设置</h3><p><code>KieModuleRepo</code> 属性：用于定义 <code>KieModule</code> 缓存区的大小。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// GA 缓存的最大 Size 相关属性</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String CACHE_GA_MAX_PROPERTY = <span class="string">"kie.repository.project.cache.size"</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_SIZE_GA_CACHE <span class="comment">// made changeable for test purposes</span></span><br><span class="line">        = Integer.parseInt(System.getProperty(CACHE_GA_MAX_PROPERTY, <span class="string">"100"</span>));</span><br><span class="line"></span><br><span class="line"><span class="comment">// Version 缓存的最大 Size 相关属性</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String CACHE_VERSIONS_MAX_PROPERTY = <span class="string">"kie.repository.project.versions.cache.size"</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_SIZE_GA_VERSIONS_CACHE <span class="comment">// made changeable for test purposes</span></span><br><span class="line">        = Integer.parseInt(System.getProperty(CACHE_VERSIONS_MAX_PROPERTY, <span class="string">"10"</span>));</span><br></pre></td></tr></table></figure>
+
+<h3 id="KieModule-缓存"><a href="#KieModule-缓存" class="headerlink" title="KieModule 缓存"></a>KieModule 缓存</h3><p><code>KieModule</code> 的缓存分为两类：</p>
+<ul>
+<li><strong>KieModule 缓存：</strong> 缓存分为两级，第一级：键为 GA(规则包的 <code>groupId</code> 及 <code>artifactId</code>)，值为 <code>NavigableMap</code>，也称为 GA 缓存 。其中 <code>NavigableMap</code> 是同 GA 不同 <code>Version</code> 的一组 <code>KieModule</code>。</li>
+<li><strong>OldKieModule 缓存：</strong> 主要存储旧版本的 <code>KieModule</code>。键为 GAV，这里用一个实体类 <code>ReleaseId</code> 来表示。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// KieModules 缓存区，大小为 GA Size</span></span><br><span class="line"><span class="keyword">final</span> Map&lt;String, NavigableMap&lt;ComparableVersion, KieModule&gt;&gt; kieModules</span><br><span class="line">        = <span class="keyword">new</span> LinkedHashMap&lt;String, NavigableMap&lt;ComparableVersion, KieModule&gt;&gt;(<span class="number">16</span>, <span class="number">0.75f</span>, <span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;String, NavigableMap&lt;ComparableVersion, KieModule&gt;&gt; eldest)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (size() &gt; MAX_SIZE_GA_CACHE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// oldKieModules 缓存区，大小为 GA Size * Version Size</span></span><br><span class="line"><span class="keyword">final</span> LinkedHashMap&lt;ReleaseId, KieModule&gt; oldKieModules = <span class="keyword">new</span> LinkedHashMap&lt;ReleaseId, KieModule&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">(Map.Entry&lt;ReleaseId, KieModule&gt; eldest)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> size() &gt; (MAX_SIZE_GA_CACHE * MAX_SIZE_GA_VERSIONS_CACHE);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>上述的两个缓存区都使用 <code>LinkedHashMap</code> 实现了 LRU（近期最少使用）算法，用来控制缓存区的大小，在缓存区无多余容量时，将最少使用的 <code>KieModule</code> 移出缓存区（新技能 Get）。</p>
+<h3 id="添加-KieModule"><a href="#添加-KieModule" class="headerlink" title="添加 KieModule"></a>添加 KieModule</h3><p>整个 <code>KieModule</code> 的添加流程可以分成三步：<br>第一步：<code>ReleaseId</code> 的拆解，即分为 GA 与 <code>Version</code>。<br>第二步：<code>KieModule</code> 二级缓存 <code>NavigableMap</code> 的获取（创建）。<br>第三步：备份旧的 <code>KieModule</code>，并添加新的 <code>KieModule</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">store</span><span class="params">(KieModule kieModule)</span> </span>&#123;</span><br><span class="line">    ReleaseId releaseId = kieModule.getReleaseId();</span><br><span class="line">    <span class="comment">// 拼接 groupId 及 artifactId 用来标识仓库里面一组同 GA 的 KieModule</span></span><br><span class="line">    String ga = releaseId.getGroupId() + <span class="string">":"</span> + releaseId.getArtifactId();</span><br><span class="line">    <span class="comment">// 根据 KieModule 的版本号通过某种算法计算出一个可比较的版本</span></span><br><span class="line">    ComparableVersion comparableVersion = <span class="keyword">new</span> ComparableVersion(releaseId.getVersion());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取相同 GA 的 KieModule 集合</span></span><br><span class="line">    NavigableMap&lt;ComparableVersion, KieModule&gt; artifactMap = kieModules.get(ga);</span><br><span class="line">    <span class="keyword">if</span>( artifactMap == <span class="keyword">null</span> ) &#123;</span><br><span class="line">        artifactMap = createNewArtifactMap();</span><br><span class="line">        kieModules.put(ga, artifactMap);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 正式添加 KieModule 之前，备份旧的 KieModule</span></span><br><span class="line">    KieModule oldReleaseIdKieModule = oldKieModules.get(releaseId);</span><br><span class="line">    <span class="comment">// variable used in order to test race condition</span></span><br><span class="line">    <span class="keyword">if</span> (oldReleaseIdKieModule == <span class="keyword">null</span>) &#123;</span><br><span class="line">        KieModule oldKieModule = artifactMap.get(comparableVersion);</span><br><span class="line">        <span class="keyword">if</span> (oldKieModule != <span class="keyword">null</span>) &#123;</span><br><span class="line">            oldKieModules.put( releaseId, oldKieModule );</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 正式添加 KieModule</span></span><br><span class="line">    artifactMap.put( comparableVersion, kieModule );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这三步操作中，第一步里面有一个 <code>ComparableVersion</code> 的计算，这里暂时不做赘述，详情请参考 <code>ComparableVersion</code> 的实现。重点看一下第二步中的 <code>NavigableMap</code> 的初始化，也是版本管理中的重中之重。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> NavigableMap&lt;ComparableVersion, KieModule&gt; <span class="title">createNewArtifactMap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 使用实现 TreeMap 匿名内部类，作用：保证 KieModule 缓存中元素按照 ComparableVersion 进行排序</span></span><br><span class="line">    NavigableMap&lt;ComparableVersion, KieModule&gt; newArtifactMap = <span class="keyword">new</span> TreeMap&lt;ComparableVersion, KieModule&gt;() &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 此处定义一个 Map 指向 TreeMap 本身的实例，是因为需要在索引队列中，对真实的 KieModule 缓存进行了删除操作</span></span><br><span class="line">        <span class="comment">// 而匿名内部类无法访问到外部类的实例，所以增加一个 final 的引用指向外部类的一个实例，即真实的缓存容器</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;ComparableVersion, KieModule&gt; artifactMap = <span class="keyword">this</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用 LinkedHashMap 实现一个 LRU 队列，存储了真实缓存 artifactMap 里面的 Key（相当于索引），下面称索引队列</span></span><br><span class="line">        <span class="comment">// 主要作用：限制 KieModule 缓存容器的无限增长</span></span><br><span class="line">        LinkedHashMap&lt;ComparableVersion, Object&gt; backingLRUMap = <span class="keyword">new</span> LinkedHashMap&lt;KieRepositoryImpl.ComparableVersion, Object&gt;(<span class="number">16</span>, <span class="number">0.75f</span>, <span class="keyword">true</span>) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">removeEldestEntry</span><span class="params">( Map.Entry&lt;ComparableVersion, Object&gt; eldest )</span> </span>&#123;</span><br><span class="line">                <span class="comment">// 当集合中元素数量超过缓存允许的最大限制时，移除最老（根据访问顺序或插入顺序判断）的元素</span></span><br><span class="line">                <span class="keyword">boolean</span> remove = (size() &gt; MAX_SIZE_GA_VERSIONS_CACHE);</span><br><span class="line"></span><br><span class="line">                <span class="comment">//  根据 backingLRUMap 存储的索引删除真实缓存 artifactMap 里面的 KieModule</span></span><br><span class="line">                <span class="keyword">if</span>( remove ) &#123;</span><br><span class="line">                    artifactMap.remove(eldest.getKey());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> remove;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> KieModule <span class="title">put</span><span class="params">( ComparableVersion key, KieModule value )</span> </span>&#123;</span><br><span class="line">            <span class="comment">// 向索引队列里面插入一个最新的索引</span></span><br><span class="line">            backingLRUMap.put(key, PRESENT);</span><br><span class="line">            <span class="comment">// 向真实缓存 artifactMap 中插入最新的 KieModule，此处不可以使用 artifactMap 直接调用，会造成死循环</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">super</span>.put(key, value);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;;</span><br><span class="line">    <span class="keyword">return</span> newArtifactMap;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到注释比代码还要多，由此可见这段代码的逻辑较之前面的代码复杂了很多。此段代码我们从变量入手来剖析它：</p>
+<ol>
+<li><strong>newArtifactMap</strong>：这是此方法的最终结果，用来存储同 GA 的 <code>KieModule</code> 的集合，每个 <code>KieModule</code> 需要按照版本号进行排序，所以将其类型定义为 <code>TreeMap</code>。由于同一个集合不能同时为 <code>TreeMap</code> 与 <code>LinkedHashMap</code>，所以它借用了 <code>backingLRUMap</code> 来帮它完成 LRU 的功能。</li>
+<li><strong>backingLRUMap</strong>：存储 <code>KieModule</code> 在 <code>newArtifactMap</code> 中的索引，即 <code>ComparableVersion</code>，对其进行 LRU 排序，协助 <code>newArtifactMap</code> 完成限制缓存大小的功能。</li>
+<li><strong>artifactMap</strong>：<code>backingLRUMap</code> 为一个内部类实现，但它需要获取对其外部类实例的一个操作权限，所以它必须持有外部类实例的引用，因此，<code>artifactMap</code> 的诞生完美地解决掉了这个问题。</li>
+</ol>
+<p>程序虽然短小，但设计十分精巧，令人叹服。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="qchery wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    qchery
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://qchery.github.io/2017/04/02/Drools之KieModule版本管理/" title="Drools之KieModule版本管理">http://qchery.github.io/2017/04/02/Drools之KieModule版本管理/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/Drools/" rel="tag"># Drools</a>
+          
+            <a href="/tags/KieModule/" rel="tag"># KieModule</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/26/Maven插件编写之初识Mojo/" rel="next" title="Maven插件编写之初识Mojo">
+                <i class="fa fa-chevron-left"></i> Maven插件编写之初识Mojo
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/01/Bean生命周期(一) 浅尝知味/" rel="prev" title="Bean生命周期(一)  浅尝知味">
+                Bean生命周期(一)  浅尝知味 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qchery</p>
+              <p class="site-description motion-element" itemprop="description">一个金融IT的技术笔记</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/qchery" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:chinrui1016@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#规则动态更新的简单描述"><span class="nav-number">1.</span> <span class="nav-text">规则动态更新的简单描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#KieModule-仓库"><span class="nav-number">2.</span> <span class="nav-text">KieModule 仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#KieModuleRepo-的属性设置"><span class="nav-number">2.1.</span> <span class="nav-text">KieModuleRepo 的属性设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#KieModule-缓存"><span class="nav-number">2.2.</span> <span class="nav-text">KieModule 缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#添加-KieModule"><span class="nav-number">2.3.</span> <span class="nav-text">添加 KieModule</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qchery</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz',
+        appKey: 'WrkItEsXn8is88v2tvi0mwbg',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!',
+        avatar:'mp',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz", "WrkItEsXn8is88v2tvi0mwbg");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
