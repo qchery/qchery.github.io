@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next gemini" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Fira Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,源码,Environment,配置,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SpringBoot 的配置加载主要通过事件广播机制来完成，即由 SpringApplication 启动过程中，通过调用 SpringApplicationRunListener.environmentPrepared() 触发 ConfigFileApplicationListener 对 ApplicationEvent 事件的响应。  由于本文主要分析配置加载的流程，对于启动过程中的事件传">
+<meta name="keywords" content="Spring,源码,Environment,配置">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot配置文件加载">
+<meta property="og:url" content="http://qchery.github.io/2019/10/18/SpringBoot配置文件加载/index.html">
+<meta property="og:site_name" content="Q码记">
+<meta property="og:description" content="SpringBoot 的配置加载主要通过事件广播机制来完成，即由 SpringApplication 启动过程中，通过调用 SpringApplicationRunListener.environmentPrepared() 触发 ConfigFileApplicationListener 对 ApplicationEvent 事件的响应。  由于本文主要分析配置加载的流程，对于启动过程中的事件传">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/18/Environment%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/18/Environment%E5%8A%A0%E8%BD%BD%E7%BB%93%E6%9E%9C.jpg">
+<meta property="og:updated_time" content="2019-10-20T09:37:17.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringBoot配置文件加载">
+<meta name="twitter:description" content="SpringBoot 的配置加载主要通过事件广播机制来完成，即由 SpringApplication 启动过程中，通过调用 SpringApplicationRunListener.environmentPrepared() 触发 ConfigFileApplicationListener 对 ApplicationEvent 事件的响应。  由于本文主要分析配置加载的流程，对于启动过程中的事件传">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/18/Environment%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://qchery.github.io/2019/10/18/SpringBoot配置文件加载/">
+
+
+
+
+
+  <title>SpringBoot配置文件加载 | Q码记</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Q码记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">崇尚专注，乐于分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://qchery.github.io/2019/10/18/SpringBoot配置文件加载/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qchery">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Q码记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SpringBoot配置文件加载</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-18T14:48:49+08:00">
+                2019-10-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/10/18/SpringBoot配置文件加载/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/10/18/SpringBoot配置文件加载/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/10/18/SpringBoot配置文件加载/" class="leancloud_visitors" data-flag-title="SpringBoot配置文件加载">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SpringBoot 的配置加载主要通过事件广播机制来完成，即由 <code>SpringApplication</code> 启动过程中，通过调用 <code>SpringApplicationRunListener.environmentPrepared()</code> 触发 <code>ConfigFileApplicationListener</code> 对 <code>ApplicationEvent</code> 事件的响应。 </p>
+<p>由于本文主要分析配置加载的流程，对于启动过程中的事件传播不做过多的介绍，直接从 <code>ConfigFileApplicationListener</code> 开始学习具体的配置加载流程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(ApplicationEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ApplicationEnvironmentPreparedEvent) &#123;</span><br><span class="line">        onApplicationEnvironmentPreparedEvent((ApplicationEnvironmentPreparedEvent) event);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (event <span class="keyword">instanceof</span> ApplicationPreparedEvent) &#123;</span><br><span class="line">        onApplicationPreparedEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onApplicationEnvironmentPreparedEvent</span><span class="params">(ApplicationEnvironmentPreparedEvent event)</span> </span>&#123;</span><br><span class="line">    List&lt;EnvironmentPostProcessor&gt; postProcessors = loadPostProcessors();</span><br><span class="line">    <span class="comment">// 将其自身添加到 EnvironmentPostProcessor 列表，用于处理配置文件的加载</span></span><br><span class="line">    postProcessors.add(<span class="keyword">this</span>);</span><br><span class="line">    AnnotationAwareOrderComparator.sort(postProcessors);</span><br><span class="line">    <span class="keyword">for</span> (EnvironmentPostProcessor postProcessor : postProcessors) &#123;</span><br><span class="line">        postProcessor.postProcessEnvironment(event.getEnvironment(), event.getSpringApplication());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>在 <code>ConfigFileApplicationListener</code> 里面，实际上是可以监听两类事件的，其中对 <code>ApplicationEnvironmentPreparedEvent</code> 事件的处理就是我们要学习的重点。该事件处理主要由 <code>EnvironmentPostProcessor</code> 完成的，默认情况下有三种 <code>EnvironmentPostProcessor</code> 实现，其中两种从 <code>META-INF/spring.factories</code> 加载获得，最后一种则是 <code>ConfigFileApplicationListener</code> 本身，也是我们要学习的重点，其实现了 <code>EnvironmentPostProcessor</code> 接口，并对 <code>postProcessEnvironment()</code> 方法进行了重写。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">postProcessEnvironment</span><span class="params">(ConfigurableEnvironment environment, SpringApplication application)</span> </span>&#123;</span><br><span class="line">    addPropertySources(environment, application.getResourceLoader());</span><br><span class="line">    configureIgnoreBeanInfo(environment);</span><br><span class="line">    bindToSpringApplication(environment, application);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">addPropertySources</span><span class="params">(ConfigurableEnvironment environment, ResourceLoader resourceLoader)</span> </span>&#123;</span><br><span class="line">    RandomValuePropertySource.addToEnvironment(environment);</span><br><span class="line">    <span class="comment">// 配置加载主逻辑在此</span></span><br><span class="line">    <span class="keyword">new</span> Loader(environment, resourceLoader).load();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整个流程分为两个步骤：</p>
+<ol>
+<li>通过内部类 <code>Loader</code> 完成 <code>Environment</code> 的加载</li>
+<li>完成 <code>Environment</code> 与 <code>SpringApplication</code> 的绑定</li>
+</ol>
+<h2 id="ConfigFileApplicationListener-Loader-实现"><a href="#ConfigFileApplicationListener-Loader-实现" class="headerlink" title="ConfigFileApplicationListener#Loader 实现"></a>ConfigFileApplicationListener#Loader 实现</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">load</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.propertiesLoader = <span class="keyword">new</span> PropertySourcesLoader();</span><br><span class="line">    <span class="keyword">this</span>.activatedProfiles = <span class="keyword">false</span>;</span><br><span class="line">    <span class="comment">// Profile队列，后进先出，与栈功能类似</span></span><br><span class="line">    <span class="keyword">this</span>.profiles = Collections.asLifoQueue(<span class="keyword">new</span> LinkedList&lt;Profile&gt;());</span><br><span class="line">    <span class="keyword">this</span>.processedProfiles = <span class="keyword">new</span> LinkedList&lt;Profile&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 添加预置的 Profile，可以通过 Environment.setActiveProfiles() 指定</span></span><br><span class="line">    <span class="comment">// 若未指定，则添加默认的 Profile，可通过 spring.profiles.default 指定Profile的名称</span></span><br><span class="line">    Set&lt;Profile&gt; initialActiveProfiles = initializeActiveProfiles();</span><br><span class="line">    <span class="keyword">this</span>.profiles.addAll(getUnprocessedActiveProfiles(initialActiveProfiles));</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.profiles.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">for</span> (String defaultProfileName : <span class="keyword">this</span>.environment.getDefaultProfiles()) &#123;</span><br><span class="line">            Profile defaultProfile = <span class="keyword">new</span> Profile(defaultProfileName, <span class="keyword">true</span>);</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.profiles.contains(defaultProfile)) &#123;</span><br><span class="line">                <span class="keyword">this</span>.profiles.add(defaultProfile);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在队列最后添加一个空的 Profile，使得其可以在第一个加载，即默认的配置文件会在所有指定了Profile的配置文件之前加载</span></span><br><span class="line">    <span class="comment">// 如：application.properties 在 application-dev.properties 之前加载</span></span><br><span class="line">    <span class="keyword">this</span>.profiles.add(<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历所有 profile，逐个进行加载</span></span><br><span class="line">    <span class="keyword">while</span> (!<span class="keyword">this</span>.profiles.isEmpty()) &#123;</span><br><span class="line">        Profile profile = <span class="keyword">this</span>.profiles.poll();</span><br><span class="line">        <span class="comment">// 按配置的查询路径查询配置文件，默认为："file:./config/"，"file:./"，"classpath:/config/"，"classpath:/"</span></span><br><span class="line">        <span class="comment">// 可通过配置 spring.config.location 进行指定</span></span><br><span class="line">        <span class="comment">// 若配置的路径不以/结尾，则认定为是文件，会直接进行加载</span></span><br><span class="line">        <span class="keyword">for</span> (String location : getSearchLocations()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!location.endsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">                load(location, <span class="keyword">null</span>, profile);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 按配置的名称查找配置文件，默认为：application，可通过 spring.config.name 进行调整</span></span><br><span class="line">                <span class="keyword">for</span> (String name : getSearchNames()) &#123;</span><br><span class="line">                    load(location, name, profile);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 将当前的profile添加到已处理列表</span></span><br><span class="line">        <span class="keyword">this</span>.processedProfiles.add(profile);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将加载所得的 PropertySources 添加到 Environment 之中</span></span><br><span class="line">    addConfigurationProperties(<span class="keyword">this</span>.propertiesLoader.getPropertySources());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">load</span><span class="params">(String location, String name, Profile profile)</span> </span>&#123;</span><br><span class="line">    String group = <span class="string">"profile="</span> + ((profile != <span class="keyword">null</span>) ? profile : <span class="string">""</span>);</span><br><span class="line">    <span class="keyword">if</span> (!StringUtils.hasText(name)) &#123;</span><br><span class="line">        <span class="comment">// 未指定 name 的情况下，认为 location 就是完整的文件路径，直接进行加载</span></span><br><span class="line">        loadIntoGroup(group, location, profile);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 根据 PropertySourcesLoader 所支持的文件后缀名依次加载对应的配置文件</span></span><br><span class="line">        <span class="comment">// 支持的文件有如下四种： "properties"，"xml"，"yml"，"yaml"</span></span><br><span class="line">        <span class="keyword">for</span> (String ext : <span class="keyword">this</span>.propertiesLoader.getAllFileExtensions()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (profile != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 加载指定Profile的配置文件，只会加载yml文件里面的默认分块</span></span><br><span class="line">                loadIntoGroup(group, location + name + <span class="string">"-"</span> + profile + <span class="string">"."</span> + ext, <span class="keyword">null</span>);</span><br><span class="line">                <span class="keyword">for</span> (Profile processedProfile : <span class="keyword">this</span>.processedProfiles) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (processedProfile != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        loadIntoGroup(group, location + name + <span class="string">"-"</span> + processedProfile + <span class="string">"."</span> + ext, profile);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 加载 yml 文件中标识为 profile 的分块</span></span><br><span class="line">                <span class="comment">// 如：当前 profile 为 dev, 则该调用会加载 application-dev.yml 文件中使用 "spring.profiles: dev" 标识的分块</span></span><br><span class="line">                loadIntoGroup(group, location + name + <span class="string">"-"</span> + profile + <span class="string">"."</span> + ext, profile);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 加载默认配置文件中使用 profile 标识的特定分块</span></span><br><span class="line">            <span class="comment">// 如：当前 profile 为 dev, 则该调用会加载 application.yml 文件中使用  "spring.profiles: dev" 标识的分块</span></span><br><span class="line">            loadIntoGroup(group, location + name + <span class="string">"."</span> + ext, profile);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> PropertySource&lt;?&gt; loadIntoGroup(String identifier, String location, Profile profile) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> doLoadIntoGroup(identifier, location, profile);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Failed to load property source from location '"</span> + location + <span class="string">"'"</span>, ex);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此方法中有部分Trace日志，已被清除，只保留有核心的逻辑</span></span><br><span class="line"><span class="keyword">private</span> PropertySource&lt;?&gt; doLoadIntoGroup(String identifier, String location, Profile profile)</span><br><span class="line">        <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">    Resource resource = <span class="keyword">this</span>.resourceLoader.getResource(location);</span><br><span class="line">    PropertySource&lt;?&gt; propertySource = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (resource != <span class="keyword">null</span> &amp;&amp; resource.exists()) &#123;</span><br><span class="line">        String name = <span class="string">"applicationConfig: ["</span> + location + <span class="string">"]"</span>;</span><br><span class="line">        String group = <span class="string">"applicationConfig: ["</span> + identifier + <span class="string">"]"</span>;</span><br><span class="line">        propertySource = <span class="keyword">this</span>.propertiesLoader.load(resource, group, name,</span><br><span class="line">                (profile != <span class="keyword">null</span>) ? profile.getName() : <span class="keyword">null</span>);</span><br><span class="line">        <span class="keyword">if</span> (propertySource != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 处理Profile属性，将新增的Profile添加到LIFO队列</span></span><br><span class="line">            <span class="comment">// 如：从 application.yml 中读取到配置 spring.profiles.active: dev 则将 dev 加入到队列</span></span><br><span class="line">            handleProfileProperties(propertySource);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> propertySource;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在内部类 <code>Loader</code> 的实现里面，主要包括以下几个步骤：</p>
+<ol>
+<li>添加 <code>Environment.setActiveProfiles()</code> 指定（或默认）的 <code>Profile</code> 到 LIFO 队列，并在队列最后添加一个空元素，以保证默认的配置文件优先加载，如：<code>application.yml</code> 优先 <code>application-dev.yml</code> 加载;</li>
+<li>遍历 <code>Profile</code> 队列，依次进行加载，流程分为两个步骤：<ol>
+<li>按查询路径、文件名、后缀名等查找配置文件</li>
+<li>解析配置文件，并将其添加到对应的分组</li>
+</ol>
+</li>
+<li>查找配置文件所在路径<ol>
+<li>按配置的查询路径查找配置文件，默认为：<code>file:./config/</code>，<code>file:./</code>，<code>classpath:/config/</code>，<code>classpath:/</code>，可通过 <code>spring.config.location</code> 进行指定;</li>
+<li>相同路径下，按配置的文件名前缀依次查找配置文件，默认为 <code>application</code>，可通过 <code>spring.config.name</code> 进行调整；</li>
+<li>相同的文件名前缀，则按 <code>PropertySourcesLoader</code> 支持的文件名后缀进行查找，默认为：<code>properties</code>，<code>xml</code>，<code>yml</code>，<code>yaml</code>，其中 <code>properties</code>，<code>xml</code> 为 <code>PropertiesPropertySourceLoader</code> 提供支持，<code>yml</code>，<code>yaml</code> 由 <code>YamlPropertySourceLoader</code> 提供支持；</li>
+</ol>
+</li>
+<li>解析配置文件<ol>
+<li>对于 <code>properties</code> 及 <code>xml</code> 文件，直接加载profile对应的文件即可；</li>
+<li>对于 <code>yml</code> 及 <code>yaml</code> 文件，由于该类文件语法中支持分块配置，Spring 通过 <code>spring.profiles</code> 配置项可将文件分成多个块，加载过程也可以按块加载。未指定 profile 的情况下，直接加载 <code>application.yml</code> 的默认块，若指定 profile 为 dev，则按 <code>application-dev.yml#default</code>，<code>application-dev.yml#dev</code>，<code>application.yml#dev</code> 进行依次加载;</li>
+</ol>
+</li>
+<li>将解析后所得的 <code>PropertySources</code> 添加到 <code>Environment</code>;</li>
+</ol>
+<h2 id="PropertySourcesLoader-实现"><a href="#PropertySourcesLoader-实现" class="headerlink" title="PropertySourcesLoader 实现"></a>PropertySourcesLoader 实现</h2><p>配置文件的解析与组装都是由 <code>PropertySourcesLoader</code> 完成的，<code>PropertySourcesLoader</code> 会将加载到的配置信息进行分组，并封装到 <code>EnumerableCompositePropertySource</code> 之中。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> PropertySource&lt;?&gt; load(Resource resource, String group, String name, String profile) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">	<span class="keyword">if</span> (isFile(resource)) &#123;</span><br><span class="line">		String sourceName = generatePropertySourceName(name, profile);</span><br><span class="line">		<span class="comment">// 根据文件名后缀使用不同的 PropertySourceLoader 进行配置解析</span></span><br><span class="line">		<span class="keyword">for</span> (PropertySourceLoader loader : <span class="keyword">this</span>.loaders) &#123;</span><br><span class="line">			<span class="keyword">if</span> (canLoadFileExtension(loader, resource)) &#123;</span><br><span class="line">				PropertySource&lt;?&gt; specific = loader.load(sourceName, resource, profile);</span><br><span class="line">				<span class="comment">// 将解析好的 PropertySource 添加到对应的配置分组，默认情况下按 profile 进行分组</span></span><br><span class="line">				addPropertySource(group, specific);</span><br><span class="line">				<span class="keyword">return</span> specific;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> String <span class="title">generatePropertySourceName</span><span class="params">(String name, String profile)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> (profile != <span class="keyword">null</span>) ? name + <span class="string">"#"</span> + profile : name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">addPropertySource</span><span class="params">(String basename, PropertySource&lt;?&gt; source)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (source == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (basename == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">this</span>.propertySources.addLast(source);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	EnumerableCompositePropertySource group = getGeneric(basename);</span><br><span class="line">	group.add(source);</span><br><span class="line">	logger.trace(<span class="string">"Adding PropertySource: "</span> + source + <span class="string">" in group: "</span> + basename);</span><br><span class="line">	<span class="comment">// 已经存在对应的分组，则使用最新的进行替换</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="keyword">this</span>.propertySources.contains(group.getName())) &#123;</span><br><span class="line">		<span class="keyword">this</span>.propertySources.replace(group.getName(), group);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">// 将新的分组，添加到列表的第一个，使得后加载的 profile 优先级更高</span></span><br><span class="line">		<span class="comment">// 如：application-dev.yml 在 appliction.yml 之后加载，但获取配置时，application-dev.yml 优先级更高</span></span><br><span class="line">		<span class="keyword">this</span>.propertySources.addFirst(group);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> EnumerableCompositePropertySource <span class="title">getGeneric</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">	PropertySource&lt;?&gt; source = <span class="keyword">this</span>.propertySources.get(name);</span><br><span class="line">	<span class="keyword">if</span> (source <span class="keyword">instanceof</span> EnumerableCompositePropertySource) &#123;</span><br><span class="line">		<span class="keyword">return</span> (EnumerableCompositePropertySource) source;</span><br><span class="line">	&#125;</span><br><span class="line">	EnumerableCompositePropertySource composite = <span class="keyword">new</span> EnumerableCompositePropertySource(name);</span><br><span class="line">	<span class="keyword">return</span> composite;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Environment 加载需要理解文件的查找方式、加载顺序及加载完成后的配置优先级。</p>
+<ul>
+<li><p><strong>查找方式</strong>：在文中已经描述的很清楚，按路径、文件名、后缀名依次逐级递进查找。</p>
+</li>
+<li><p><strong>加载顺序</strong>：相对就复杂了很多，以一张图概括如下：</p>
+</li>
+</ul>
+<p><strong>图3.3 Environment加载顺序</strong></p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/18/Environment%E5%8A%A0%E8%BD%BD%E9%A1%BA%E5%BA%8F.jpg" alt="Environment加载顺序"></p>
+<p>这里对 <code>yaml</code> 文件画的比较简单，实际上它与 <code>yml</code> 类似，也是分三步加载的。</p>
+<ul>
+<li><strong>配置优先级</strong>：与加载顺序非常类似，唯一的区别是，组级别的顺序是相反的，先加载的组优先级低于后加载的组，即上图中的 dev 组会覆盖掉 default 组的配置。</li>
+</ul>
+<p>最后，再献上一张实验的结果图，与上图的内容一致，任意理解一个即可。</p>
+<p><strong>图3.4 Environment加载实验结果</strong></p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/18/Environment%E5%8A%A0%E8%BD%BD%E7%BB%93%E6%9E%9C.jpg" alt="Environment加载实验"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="qchery wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    qchery
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://qchery.github.io/2019/10/18/SpringBoot配置文件加载/" title="SpringBoot配置文件加载">http://qchery.github.io/2019/10/18/SpringBoot配置文件加载/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
+            <a href="/tags/Environment/" rel="tag"># Environment</a>
+          
+            <a href="/tags/配置/" rel="tag"># 配置</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/16/SpringBoot启动流程/" rel="next" title="SpringBoot启动流程">
+                <i class="fa fa-chevron-left"></i> SpringBoot启动流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qchery</p>
+              <p class="site-description motion-element" itemprop="description">一个金融IT的技术笔记</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">19</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/qchery" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:chinrui1016@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ConfigFileApplicationListener-Loader-实现"><span class="nav-number">1.</span> <span class="nav-text">ConfigFileApplicationListener#Loader 实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PropertySourcesLoader-实现"><span class="nav-number">2.</span> <span class="nav-text">PropertySourcesLoader 实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qchery</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz',
+        appKey: 'WrkItEsXn8is88v2tvi0mwbg',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!',
+        avatar:'mp',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz", "WrkItEsXn8is88v2tvi0mwbg");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
