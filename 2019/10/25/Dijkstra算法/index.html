@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next gemini" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Fira Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="算法,Dijkstra,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="如下图，有7个节点，其中A为起始节点，G为终止节点，节点与节点之间使用边进行连接，每条边上都有一个数字表示这个边的权重，现在需要求出从A到G权重之和最短的路径。  如果这个图中每条边都等价，即没有权重，那计算路径就非常简单，直接使用广度优先遍历即可得出最短路径为 A-B-E-G，但现在边上增加了权重，广度优先遍历出来的最短路径权重之和为29，而另外一条路线 A-C-D-E-G 的权重之和却只有24">
+<meta name="keywords" content="算法,Dijkstra">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dijkstra算法">
+<meta property="og:url" content="http://qchery.github.io/2019/10/25/Dijkstra算法/index.html">
+<meta property="og:site_name" content="Q码记">
+<meta property="og:description" content="如下图，有7个节点，其中A为起始节点，G为终止节点，节点与节点之间使用边进行连接，每条边上都有一个数字表示这个边的权重，现在需要求出从A到G权重之和最短的路径。  如果这个图中每条边都等价，即没有权重，那计算路径就非常简单，直接使用广度优先遍历即可得出最短路径为 A-B-E-G，但现在边上增加了权重，广度优先遍历出来的最短路径权重之和为29，而另外一条路线 A-C-D-E-G 的权重之和却只有24">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/25/1.1_%E5%8A%A0%E6%9D%83%E5%9B%BE.jpg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/25/2.1_dijkstra_demo.jpg">
+<meta property="og:updated_time" content="2019-10-25T15:17:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dijkstra算法">
+<meta name="twitter:description" content="如下图，有7个节点，其中A为起始节点，G为终止节点，节点与节点之间使用边进行连接，每条边上都有一个数字表示这个边的权重，现在需要求出从A到G权重之和最短的路径。  如果这个图中每条边都等价，即没有权重，那计算路径就非常简单，直接使用广度优先遍历即可得出最短路径为 A-B-E-G，但现在边上增加了权重，广度优先遍历出来的最短路径权重之和为29，而另外一条路线 A-C-D-E-G 的权重之和却只有24">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/25/1.1_%E5%8A%A0%E6%9D%83%E5%9B%BE.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://qchery.github.io/2019/10/25/Dijkstra算法/">
+
+
+
+
+
+  <title>Dijkstra算法 | Q码记</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Q码记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">崇尚专注，乐于分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://qchery.github.io/2019/10/25/Dijkstra算法/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qchery">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Q码记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Dijkstra算法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-25T21:13:18+08:00">
+                2019-10-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/数据结构与算法/" itemprop="url" rel="index">
+                    <span itemprop="name">数据结构与算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/10/25/Dijkstra算法/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/10/25/Dijkstra算法/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/10/25/Dijkstra算法/" class="leancloud_visitors" data-flag-title="Dijkstra算法">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>如下图，有7个节点，其中A为起始节点，G为终止节点，节点与节点之间使用边进行连接，每条边上都有一个数字表示这个边的权重，现在需要求出从A到G权重之和最短的路径。</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/25/1.1_%E5%8A%A0%E6%9D%83%E5%9B%BE.jpg" alt="加权图"></p>
+<p>如果这个图中每条边都等价，即没有权重，那计算路径就非常简单，直接使用广度优先遍历即可得出最短路径为 A-B-E-G，但现在边上增加了权重，广度优先遍历出来的最短路径权重之和为29，而另外一条路线 A-C-D-E-G 的权重之和却只有24，显然新的这条路径更优。</p>
+<p>那问题来了，在这种加权图中，怎么找到最短路径呢？答案就是迪杰斯特拉算法(Dijkstra Algorithm)。</p>
+<a id="more"></a>
+
+<h2 id="什么是Dijkstra算法？"><a href="#什么是Dijkstra算法？" class="headerlink" title="什么是Dijkstra算法？"></a>什么是Dijkstra算法？</h2><p>迪杰斯特拉算法(Dijkstra)是从一个顶点到其余各顶点的最短路径算法，解决的是加权图中最短路径问题。迪杰斯特拉算法主要特点是以起始点为中心，向外层层扩展，直到扩展到终点为止。</p>
+<p>Dijkstra算法主要包括4个步骤：</p>
+<ol>
+<li>找出成本最低的节点，即路径权重之和最小的节点。</li>
+<li>更新该节点相邻节点的开销。</li>
+<li>重复这个过程，直到对图中的每个节点都进行了这样的操作。</li>
+<li>计算最终路径。</li>
+</ol>
+<p>为了节约篇幅，这里使用一个更加简单的加权图来对流程进行描述</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/25/2.1_dijkstra_demo.jpg" alt="案例讲解示例图"></p>
+<p>假设有一个人需要从A去到D，但是没有直达的路径，需要经过B或者C进行中转，行进过程中所需要的时间就是边上的权重值，单位为分钟，下面来一起看下整体算法的运作流程。</p>
+<p>第一步，因为A为起点，可以直接更新其相邻节点的所需要的时间。很显然，B的耗时为6分钟，C的耗时为2分钟。与A不相邻的节点，由于还不知道具体所需要消耗的时间，这里先假定为无穷大。</p>
+<table>
+<thead>
+<tr>
+<th>地点</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B</td>
+<td>6分钟</td>
+</tr>
+<tr>
+<td>C</td>
+<td>2分钟</td>
+</tr>
+<tr>
+<td>D</td>
+<td>无穷大</td>
+</tr>
+</tbody></table>
+<p>第二步，由于C目前耗时最少，所以更新C相邻节点的耗时。这个时候会发现一条前往B节点耗时更少的路径，由C前往B只需要5分钟，故对B节点的最小耗时进行更新，另外D节点的耗时需要更新为7分钟。</p>
+<table>
+<thead>
+<tr>
+<th>地点</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B</td>
+<td>5分钟</td>
+</tr>
+<tr>
+<td>C</td>
+<td>2分钟</td>
+</tr>
+<tr>
+<td>D</td>
+<td>7分钟</td>
+</tr>
+</tbody></table>
+<p>第三步，除了C节点外，耗时最少的节点就是B节点了，更新B节点所有相邻节点的耗时。会发现终点D的最小耗时为6分钟。</p>
+<p>最终，对所有节点都进行了Dijkstra算法，得出每个节点的耗时分别为：</p>
+<table>
+<thead>
+<tr>
+<th>地点</th>
+<th>时间</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>B</td>
+<td>5分钟</td>
+</tr>
+<tr>
+<td>C</td>
+<td>2分钟</td>
+</tr>
+<tr>
+<td>D</td>
+<td>6分钟</td>
+</tr>
+</tbody></table>
+<p>从起点到终点的最短路径为 A-C-B-D，总计耗时6分钟。</p>
+<h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><p>Dijkstra 算法的整体逻辑不算复杂，代码实现也比较简单，首先，对图结构进行抽象，先封装成三类对象：节点、边、图，对应的代码实现依次如下：</p>
+<h3 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h3><p>节点有三个属性，分别为节点的ID、进出的两组边。另外，还封装了一些简单的方法，如：求两个相邻节点间最小的权重，获取所有相邻节点（只包含出边）等。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Node</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String id;</span><br><span class="line">    <span class="keyword">private</span> Set&lt;Edge&gt; inEdges = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> Set&lt;Edge&gt; outEdges = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Node</span><span class="params">(String id)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Integer <span class="title">minWeightFrom</span><span class="params">(Node fromNode)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.inEdges.stream()</span><br><span class="line">                .filter(edge -&gt; edge.getFrom() == fromNode)</span><br><span class="line">                .map(Edge::getWeight).min(Integer::compareTo).orElse(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Node&gt; <span class="title">neighbors</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> outEdges.stream().map(Edge::getTo).collect(Collectors.toList());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addOutEdge</span><span class="params">(Edge edge)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.outEdges.add(edge);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInEdge</span><span class="params">(Edge edge)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.inEdges.add(edge);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="加权边"><a href="#加权边" class="headerlink" title="加权边"></a>加权边</h3><p>加权边的封装更加简单，只有出入的两个节点引用及边的权重。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lombok.AllArgsConstructor;</span><br><span class="line"><span class="keyword">import</span> lombok.Getter;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Getter</span></span><br><span class="line"><span class="meta">@AllArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Edge</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Node from;</span><br><span class="line">    <span class="keyword">private</span> Node to;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> weight;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Edge</span><span class="params">(Node fromNode, Node toNode, <span class="keyword">int</span> weight)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.from = fromNode;</span><br><span class="line">        <span class="keyword">this</span>.to = toNode;</span><br><span class="line">        <span class="keyword">this</span>.weight = weight;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="有向图"><a href="#有向图" class="headerlink" title="有向图"></a>有向图</h3><p>有向图的实现稍微复杂一点点，它保存了所有的节点，并标明了起始节点与终止节点，看起来更像是一个用于构造图结构的工具，它提供了连接，打标，查找等功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> lombok.Getter;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Getter</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Graph</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Node startNode;</span><br><span class="line">    <span class="keyword">private</span> Node endNode;</span><br><span class="line">    <span class="keyword">private</span> Set&lt;Node&gt; nodes = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Graph <span class="title">addNodes</span><span class="params">(String... ids)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (ids != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (String id : ids) &#123;</span><br><span class="line">                nodes.add(<span class="keyword">new</span> Node(id));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Graph <span class="title">tag</span><span class="params">(String startId, String endId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.startNode = findNode(startId);</span><br><span class="line">        <span class="keyword">this</span>.endNode = findNode(endId);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Graph <span class="title">link</span><span class="params">(String fromNodeId, String toNodeId, <span class="keyword">int</span> weight)</span> </span>&#123;</span><br><span class="line">        Node fromNode = findNode(fromNodeId);</span><br><span class="line">        Node toNode = findNode(toNodeId);</span><br><span class="line">        Edge edge = <span class="keyword">new</span> Edge(fromNode, toNode, weight);</span><br><span class="line">        fromNode.addOutEdge(edge);</span><br><span class="line">        toNode.addInEdge(edge);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Node <span class="title">findNode</span><span class="params">(String nodeId)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (Node node : nodes) &#123;</span><br><span class="line">            <span class="keyword">if</span> (node.getId().equals(nodeId)) &#123;</span><br><span class="line">                <span class="keyword">return</span> node;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="算法核心实现"><a href="#算法核心实现" class="headerlink" title="算法核心实现"></a>算法核心实现</h3><p><code>Dijkstra</code> 实现只提供了一个方法，输入一张图实例，即可得到一个运算结果 <code>DijkstraResult</code>，简单粗暴。整个实现逻辑中使用了两个比较重要的集合，一个是<code>costMap</code>，用于记录每个节点最小的权重和，另外一个是 <code>previousMap</code>，用于记录当前节点权重和最小时的前一个节点，后面会用来回溯出整个最短路径。另外，由于 JDK 里面的队列实现大多是为并发场景准备，简单一点的像 <code>PriorityQueue</code> 也附加了优先级功能，最后笔者只好使用 <code>LinkedList</code> 实现了一个最简单的队列。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Dijkstra</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> DijkstraResult <span class="title">dijkstra</span><span class="params">(Graph graph)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 除初始节点外的所有节点的成本默认为无穷大</span></span><br><span class="line">        Map&lt;Node, Integer&gt; costMap = <span class="keyword">new</span> HashMap&lt;&gt;(graph.getNodes().size() - <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">for</span> (Node node : graph.getNodes()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (node == graph.getStartNode()) &#123;</span><br><span class="line">                costMap.put(node, <span class="keyword">null</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 保留每个节点当前最小路径的前一个节点</span></span><br><span class="line">        Map&lt;Node, Node&gt; previousMap = <span class="keyword">new</span> HashMap&lt;&gt;(graph.getNodes().size() - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用LinkedList当作简单队列使用</span></span><br><span class="line">        LinkedList&lt;Node&gt; queue = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        queue.addLast(graph.getStartNode());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> (queue.size() != <span class="number">0</span>) &#123;</span><br><span class="line">            Node fromNode = queue.removeFirst();</span><br><span class="line">            List&lt;Node&gt; toNodes = fromNode.neighbors();</span><br><span class="line">            <span class="comment">// 遍历所有to节点，更新每个to节点的最小权重和</span></span><br><span class="line">            <span class="keyword">for</span> (Node toNode : toNodes) &#123;</span><br><span class="line">                <span class="comment">// 查找from节点与to节点之间的最小权重（假想from到to有多条边的情况）</span></span><br><span class="line">                Integer weight = toNode.minWeightFrom(fromNode);</span><br><span class="line">                <span class="comment">// 计算经由from节点时，to节点的最小权重和</span></span><br><span class="line">                Integer fromWeight = Optional.ofNullable(costMap.get(fromNode))</span><br><span class="line">                        .map(i -&gt; i + weight).orElse(weight);</span><br><span class="line">                <span class="comment">// 比较to节点之前的权重和与经由from节点的权重和，取小，并更新相关路由信息</span></span><br><span class="line">                Integer toWeight = costMap.get(toNode);</span><br><span class="line">                Integer minWeight = toWeight;</span><br><span class="line">                <span class="keyword">if</span> (toWeight != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (toWeight &gt; fromWeight) &#123;</span><br><span class="line">                        minWeight = fromWeight;</span><br><span class="line">                        previousMap.put(toNode, fromNode);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    minWeight = fromWeight;</span><br><span class="line">                    previousMap.put(toNode, fromNode);</span><br><span class="line">                &#125;</span><br><span class="line">                costMap.put(toNode, minWeight);</span><br><span class="line">                <span class="comment">// 将to节点添加到队列，用于更新to节点相邻节点的值和</span></span><br><span class="line">                queue.addLast(toNode);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 拼接最短路径</span></span><br><span class="line">        List&lt;Node&gt; route = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">        Node printNode = graph.getEndNode();</span><br><span class="line">        <span class="keyword">while</span> (printNode != <span class="keyword">null</span>) &#123;</span><br><span class="line">            route.add(<span class="number">0</span>, printNode);</span><br><span class="line">            printNode = previousMap.get(printNode);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> DijkstraResult(route, costMap.get(graph.getEndNode()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>整个代码的逻辑应该算是比较清晰的，面向对象的语言的一个好处就是『说人话』，比满天的基础数据结构看着舒服多了。</p>
+<p>在上面的实现中还有一个最终结果的封装类，这里面也把实现代码贴一下，太简单，就不做具体描述了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DijkstraResult</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Node&gt; route;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> minWeight;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DijkstraResult</span><span class="params">(List&lt;Node&gt; route, <span class="keyword">int</span> minWeight)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.route = route;</span><br><span class="line">        <span class="keyword">this</span>.minWeight = minWeight;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> route + <span class="string">" : "</span> + minWeight;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="算法测试"><a href="#算法测试" class="headerlink" title="算法测试"></a>算法测试</h2><p>为了验证算法的正确性，这里以文首提出的问题为示例，通过 Graph 实现构建一份完整的有向加权图。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDijkstra</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Graph graph = <span class="keyword">new</span> Graph().addNodes(<span class="string">"A"</span>, <span class="string">"B"</span>, <span class="string">"C"</span>, <span class="string">"D"</span>, <span class="string">"E"</span>, <span class="string">"F"</span>, <span class="string">"G"</span>)</span><br><span class="line">            .link(<span class="string">"A"</span>, <span class="string">"B"</span>, <span class="number">4</span>)</span><br><span class="line">            .link(<span class="string">"A"</span>, <span class="string">"C"</span>, <span class="number">10</span>)</span><br><span class="line">            .link(<span class="string">"B"</span>, <span class="string">"E"</span>, <span class="number">21</span>)</span><br><span class="line">            .link(<span class="string">"C"</span>, <span class="string">"D"</span>, <span class="number">5</span>)</span><br><span class="line">            .link(<span class="string">"C"</span>, <span class="string">"F"</span>, <span class="number">8</span>)</span><br><span class="line">            .link(<span class="string">"D"</span>, <span class="string">"E"</span>, <span class="number">5</span>)</span><br><span class="line">            .link(<span class="string">"F"</span>, <span class="string">"E"</span>, <span class="number">12</span>)</span><br><span class="line">            .link(<span class="string">"E"</span>, <span class="string">"G"</span>, <span class="number">4</span>)</span><br><span class="line">            .tag(<span class="string">"A"</span>, <span class="string">"G"</span>);</span><br><span class="line">    System.out.println(Dijkstra.dijkstra(graph));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行该单元测试，可以得到如下输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[A, C, D, E, G] : 24</span><br></pre></td></tr></table></figure>
+
+<p>与我们预期的结果完全一致，代码实现得以验证。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Dijkstra是用于求解有向加权图中两个顶点之间最短路径的算法，主要包括4个步骤：</p>
+<ol>
+<li>找出成本最低的节点，即路径权重之和最小的节点。</li>
+<li>更新该节点相邻节点的开销。</li>
+<li>重复这个过程，直到对图中的每个节点都进行了这样的操作。</li>
+<li>计算最终路径。</li>
+</ol>
+<p><strong>注意</strong>： Dijkstra算法只适用于有向无环图。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="qchery wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    qchery
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://qchery.github.io/2019/10/25/Dijkstra算法/" title="Dijkstra算法">http://qchery.github.io/2019/10/25/Dijkstra算法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag"># 算法</a>
+          
+            <a href="/tags/Dijkstra/" rel="tag"># Dijkstra</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/21/SpringMVC请求处理流程/" rel="next" title="SpringMVC请求处理流程">
+                <i class="fa fa-chevron-left"></i> SpringMVC请求处理流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qchery</p>
+              <p class="site-description motion-element" itemprop="description">一个金融IT的技术笔记</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/qchery" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:chinrui1016@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是Dijkstra算法？"><span class="nav-number">1.</span> <span class="nav-text">什么是Dijkstra算法？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码实现"><span class="nav-number">2.</span> <span class="nav-text">代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#节点"><span class="nav-number">2.1.</span> <span class="nav-text">节点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加权边"><span class="nav-number">2.2.</span> <span class="nav-text">加权边</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有向图"><span class="nav-number">2.3.</span> <span class="nav-text">有向图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法核心实现"><span class="nav-number">2.4.</span> <span class="nav-text">算法核心实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#算法测试"><span class="nav-number">3.</span> <span class="nav-text">算法测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qchery</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item=>{
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz',
+        appKey: 'WrkItEsXn8is88v2tvi0mwbg',
+        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!',
+        avatar:'mp',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz", "WrkItEsXn8is88v2tvi0mwbg");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
