@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next gemini" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Fira Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring,实战,Configuration,properties,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SpringBoot 允许你外部化你的配置，以便你可以在不同的环境中使用相同的应用程序代码。你可以使用 properties文件、YAML 文件、环境变量和命令行参数来外部化配置。可以使用 @Value 注解直接将属性值注入到 Bean 里面，也可以通过 @ConfigurationProperties 将属性绑定到结构化对象中。 配置注入@Value 注入SpringBoot 会默认加载类路径下">
+<meta name="keywords" content="Spring,实战,Configuration,properties">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot实战之外部配置篇">
+<meta property="og:url" content="http://qchery.github.io/2017/04/29/SpringBoot实战之外部配置篇/index.html">
+<meta property="og:site_name" content="Q码记">
+<meta property="og:description" content="SpringBoot 允许你外部化你的配置，以便你可以在不同的环境中使用相同的应用程序代码。你可以使用 properties文件、YAML 文件、环境变量和命令行参数来外部化配置。可以使用 @Value 注解直接将属性值注入到 Bean 里面，也可以通过 @ConfigurationProperties 将属性绑定到结构化对象中。 配置注入@Value 注入SpringBoot 会默认加载类路径下">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/UserController%E6%B5%8B%E8%AF%95.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/Properties%E6%B3%A8%E5%85%A5.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/Profile%E4%BD%BF%E7%94%A8.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/%E6%8C%87%E5%AE%9A%E9%85%8D%E7%BD%AE%E8%B7%AF%E5%BE%84.jpeg">
+<meta property="og:updated_time" content="2019-10-27T14:22:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringBoot实战之外部配置篇">
+<meta name="twitter:description" content="SpringBoot 允许你外部化你的配置，以便你可以在不同的环境中使用相同的应用程序代码。你可以使用 properties文件、YAML 文件、环境变量和命令行参数来外部化配置。可以使用 @Value 注解直接将属性值注入到 Bean 里面，也可以通过 @ConfigurationProperties 将属性绑定到结构化对象中。 配置注入@Value 注入SpringBoot 会默认加载类路径下">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/UserController%E6%B5%8B%E8%AF%95.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://qchery.github.io/2017/04/29/SpringBoot实战之外部配置篇/">
+
+
+
+
+
+  <title>SpringBoot实战之外部配置篇 | Q码记</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Q码记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">崇尚专注，乐于分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://qchery.github.io/2017/04/29/SpringBoot实战之外部配置篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qchery">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Q码记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SpringBoot实战之外部配置篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-29T22:20:07+08:00">
+                2017-04-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SpringBoot 允许你外部化你的配置，以便你可以在不同的环境中使用相同的应用程序代码。你可以使用 properties文件、YAML 文件、环境变量和命令行参数来外部化配置。可以使用 <code>@Value</code> 注解直接将属性值注入到 Bean 里面，也可以通过 <code>@ConfigurationProperties</code> 将属性绑定到结构化对象中。</p>
+<h1 id="配置注入"><a href="#配置注入" class="headerlink" title="配置注入"></a>配置注入</h1><h2 id="Value-注入"><a href="#Value-注入" class="headerlink" title="@Value 注入"></a>@Value 注入</h2><p>SpringBoot 会默认加载类路径下的 <code>application.properties</code> 配置，延续上一篇中的例子，我们在配置文件中添加上允许登录的用户名及密码。</p>
+<p><code>application.properties</code> 配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">user.name = 13632672222</span><br><span class="line">user.password = 123456</span><br></pre></td></tr></table></figure>
+
+<p>用户 Controller：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/sys/user"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;user.name&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String userName;</span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;user.password&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"login"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Result <span class="title">login</span><span class="params">(@RequestBody @Valid UserModel userModel)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!userName.equals(userModel.getUsername())</span><br><span class="line">                || !password.equals(userModel.getPassword())) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Result(ResultCode.PASSWORD_ERROR);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        User user = <span class="keyword">new</span> User();</span><br><span class="line">        user.setUsername(userModel.getUsername());</span><br><span class="line">        user.setPassword(userModel.getPassword());</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result(ResultCode.SUCCESS, user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>测试效果如下，配置成功：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/UserController%E6%B5%8B%E8%AF%95.jpeg" alt="UserController测试"></p>
+<h2 id="ConfigurationProperties-注入"><a href="#ConfigurationProperties-注入" class="headerlink" title="@ConfigurationProperties 注入"></a>@ConfigurationProperties 注入</h2><p>系统用户一般不会只存在一个，如果需要配置多个用户，很显示上面的注入方式是无法满足需求的，那就需要使用到 <code>@ConfigurationProperties</code> 注解了。</p>
+<p><code>application.properties</code> 配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">sys.users[0].username = 13632672222</span><br><span class="line">sys.users[0].password = 123456</span><br><span class="line">sys.users[0].age = 18</span><br><span class="line">sys.users[1].username = 13800000001</span><br><span class="line">sys.users[1].password = 654321</span><br><span class="line">sys.users[1].age = 20</span><br></pre></td></tr></table></figure>
+
+<p><code>Properties</code> 映射对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ConfigurationProperties</span>(prefix = <span class="string">"sys"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SystemProperties</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;User&gt; users = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;User&gt; <span class="title">getUsers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> users;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUsers</span><span class="params">(List&lt;User&gt; users)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.users = users;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>Mapping</code> 方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> SystemProperties systemProperties;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"list"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> Result <span class="title">list</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result(ResultCode.SUCCESS, systemProperties.getUsers());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用用户查询接口，获取用户信息如下，可以看到用户的年龄也自动转成了所需要的 int 类型：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/Properties%E6%B3%A8%E5%85%A5.jpeg" alt="Properties注入"></p>
+<h2 id="1-3-参数合法性校验"><a href="#1-3-参数合法性校验" class="headerlink" title="1.3. 参数合法性校验"></a>1.3. 参数合法性校验</h2><p>开发人员一般是无法管理生产环境的，应用的部署及维护是运维人员的工作，如果运维小伙伴一不小心漏掉了某个参数怎么办？虽然部署文档可以在一定程度上规避这些问题，但仍然存在一定的隐患，为了尽量减少此类问题，我们可以给外部配置加上相应的校验规则。</p>
+<p>要求必须配置用户，且所有用户年龄都需要在20岁以上：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ConfigurationProperties</span>(prefix = <span class="string">"sys"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SystemProperties</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotEmpty</span></span><br><span class="line">    <span class="meta">@Valid</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;User&gt; users;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">---</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String username;</span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line">    <span class="meta">@Min</span>(<span class="number">20</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果上面的配置不做任何更新，那么就会得到启动异常：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Description:</span><br><span class="line"></span><br><span class="line">Binding to target com.qchery.funda.props.SystemProperties@63192798 failed:</span><br><span class="line"></span><br><span class="line">    Property: sys.users[0].age</span><br><span class="line">    Value: 18</span><br><span class="line">    Reason: 最小不能小于20</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Action:</span><br><span class="line"></span><br><span class="line">Update your application&apos;s configuration</span><br></pre></td></tr></table></figure>
+
+<h1 id="YAML-配置"><a href="#YAML-配置" class="headerlink" title="YAML 配置"></a>YAML 配置</h1><p>YAML 是 JSON 的超集，它是一种非常方便的数据格式，用于指定带有层次结构的配置数据。当你的类路径里面带有 snakeyaml 库的时候，<code>SpringApplication</code> 类会自动支持 YAML 来替代 properties 配置。使用 <code>application.yml</code> 替换 <code>application.properties</code> 如下：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sys:</span></span><br><span class="line"><span class="attr">  users:</span></span><br><span class="line"><span class="attr">    - username:</span> <span class="number">13632672222</span></span><br><span class="line"><span class="attr">      password:</span> <span class="number">123456</span></span><br><span class="line"><span class="attr">      age:</span> <span class="number">22</span></span><br><span class="line"><span class="attr">    - username:</span> <span class="number">13800000001</span></span><br><span class="line"><span class="attr">      password:</span> <span class="number">654321</span></span><br><span class="line"><span class="attr">      age:</span> <span class="number">20</span></span><br></pre></td></tr></table></figure>
+
+<p>在 <code>User</code> 类里面添加一个新的字段 <code>nickName</code>，并在配置文件中添加相应的配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sys:</span></span><br><span class="line"><span class="attr">  users:</span></span><br><span class="line"><span class="attr">    - username:</span> <span class="number">13632672222</span></span><br><span class="line"><span class="attr">      password:</span> <span class="number">123456</span></span><br><span class="line"><span class="attr">      age:</span> <span class="number">22</span></span><br><span class="line"><span class="attr">      nickName:</span> <span class="string">张三</span></span><br><span class="line"><span class="attr">    - username:</span> <span class="number">13800000001</span></span><br><span class="line"><span class="attr">      password:</span> <span class="number">654321</span></span><br><span class="line"><span class="attr">      age:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">      nick-name:</span> <span class="string">赵四</span></span><br></pre></td></tr></table></figure>
+
+<p>当我们再次调用查询用户接口时，会返回如下报文：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"code"</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="attr">"msg"</span>: <span class="string">"请求成功"</span>,</span><br><span class="line">  <span class="attr">"data"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"username"</span>: <span class="string">"13632672222"</span>,</span><br><span class="line">      <span class="attr">"age"</span>: <span class="number">22</span>,</span><br><span class="line">      <span class="attr">"nickName"</span>: <span class="string">"张三"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"username"</span>: <span class="string">"13800000001"</span>,</span><br><span class="line">      <span class="attr">"age"</span>: <span class="number">20</span>,</span><br><span class="line">      <span class="attr">"nickName"</span>: <span class="string">"赵四"</span></span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果仔细观察配置文件的话，会发现两个用户配置 <code>nickName</code> 的方式是不一致的，一个是 <code>nickName</code>，一个是 <code>nick-name</code>，但它们两个都可以成功，这是因为 SpringBoot 将环境属性绑定到 <code>@ConfigurationProperties</code> 定义 Bean 时，使用了一些比较宽松的规则，主要包括下面几种变形：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>标注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>users.nickName</td>
+<td>标准的驼峰语法</td>
+</tr>
+<tr>
+<td>users.nick-name</td>
+<td>虚线符号，推荐在 properties 及 yml 文件中使用</td>
+</tr>
+<tr>
+<td>users.nick_name</td>
+<td>下划线符号，properties 及 yml 里面的一种替代格式</td>
+</tr>
+<tr>
+<td>USERS_NICK_NAME</td>
+<td>大写格式化，推荐在环境变量中使用</td>
+</tr>
+</tbody></table>
+<h1 id="配置分离"><a href="#配置分离" class="headerlink" title="配置分离"></a>配置分离</h1><p>开发的过程中，可能存在很多套环境，开发、集成、测试等，每个环境的配置都不一样，想要更好地维护这些环境，需要将相关的配置文件隔离开来，SpringBoot 里面提供了两种方式来帮我们完成这项任务。</p>
+<h2 id="Profile-的使用"><a href="#Profile-的使用" class="headerlink" title="Profile 的使用"></a>Profile 的使用</h2><p>对每一套环境创建一个对应的配置文件，如果开发使用 dev，集成使用 int，那么就可以创建两个配置文件，分别命名成 <code>applicationj-dev.yml</code> 与 <code>application-int.yml</code>，通过在 <code>application.yml</code> 里面声明需要激活的配置文件变更系统配置。</p>
+<p><code>application-dev.yml</code> 配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sys:</span></span><br><span class="line"><span class="attr">  users:</span></span><br><span class="line"><span class="attr">    - username:</span> <span class="number">13632672222</span></span><br><span class="line"><span class="attr">      password:</span> <span class="number">123456</span></span><br><span class="line"><span class="attr">      age:</span> <span class="number">22</span></span><br><span class="line"><span class="attr">      nickName:</span> <span class="string">张三</span></span><br></pre></td></tr></table></figure>
+
+<p><code>application-int.yml</code> 配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sys:</span></span><br><span class="line"><span class="attr">  users:</span></span><br><span class="line"><span class="attr">    - username:</span> <span class="number">13800000001</span></span><br><span class="line"><span class="attr">      password:</span> <span class="number">654321</span></span><br><span class="line"><span class="attr">      age:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">      nick-name:</span> <span class="string">赵四</span></span><br></pre></td></tr></table></figure>
+
+<p><code>application.yml</code> 配置：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  profiles:</span></span><br><span class="line"><span class="attr">    active:</span> <span class="string">int</span></span><br></pre></td></tr></table></figure>
+
+<p>最终效果如下：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/Profile%E4%BD%BF%E7%94%A8.jpeg" alt="Profile使用"></p>
+<h2 id="指定配置路径"><a href="#指定配置路径" class="headerlink" title="指定配置路径"></a>指定配置路径</h2><p><code>application.yml</code> 文件一般是存放在包内，那就存在着一个问题，生产配置无法由开发人员管理，项目打包也就不会将其打包到应用程序里面去。要解决这个问题，需要使用到 <code>spring.config.location</code> 这个配置项，由于这个配置项会被用来决定配置文件的加载路径，所以，它需要在环境属性中定义，如：系统变量、命令行参数等。</p>
+<p>去除 <code>application.yml</code> 文件，直接指定配置文件路径，得到效果如下：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/29/%E6%8C%87%E5%AE%9A%E9%85%8D%E7%BD%AE%E8%B7%AF%E5%BE%84.jpeg" alt="指定配置路径"></p>
+<p><strong>注意：</strong>当使用 <code>spring.config.location</code> 时，<code>spring.profiles.active</code> 配置项将会失效，也就是在这种模式下是不区分 profile 的，示例中只是为了让读者看的更加明白，所以使用的不同的文件名而已。</p>
+<h1 id="配置加密"><a href="#配置加密" class="headerlink" title="配置加密"></a>配置加密</h1><p>推荐一个比较好的加密工具（jasypt），下面我们来看一下该工具的用法：</p>
+<p>首先，需要添加 Jar 包的依赖项配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;com.github.ulisesbocchio:jasypt-spring-boot-starter:1.12&quot;</span><br></pre></td></tr></table></figure>
+
+<p>其次，配置解密需要用到的算法及密钥：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">jasypt:</span></span><br><span class="line"><span class="attr">  encryptor:</span></span><br><span class="line"><span class="attr">    password:</span> <span class="string">funda</span></span><br><span class="line"><span class="attr">    algorithm:</span> <span class="string">PBEWithMD5AndDES</span></span><br></pre></td></tr></table></figure>
+
+<p>然后，使用上面配置的算法及密钥对需要加密的数据进行加密，使用 <code>jasypt-1.9.2.jar</code> 对明文 root 进行加密：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp jasypt-1.9.2.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI input=&quot;root&quot; password=funda algorithm=PBEWithMD5AndDES</span><br></pre></td></tr></table></figure>
+
+<p>该命令需要在 <code>jasypt-1.9.2.jar</code> 所在的路径下执行，得到输出结果如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">----ENVIRONMENT-----------------</span><br><span class="line"></span><br><span class="line">Runtime: Oracle Corporation Java HotSpot(TM) 64-Bit Server VM 25.112-b16</span><br><span class="line"></span><br><span class="line">----ARGUMENTS-------------------</span><br><span class="line"></span><br><span class="line">algorithm: PBEWithMD5AndDES</span><br><span class="line">input: root</span><br><span class="line">password: funda</span><br><span class="line"></span><br><span class="line">----OUTPUT----------------------</span><br><span class="line"></span><br><span class="line">CJ0EN4egw8l1k6aCtr9JMA==</span><br></pre></td></tr></table></figure>
+
+<p>最后，将加密后的结果配置到配置文件中：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line"><span class="attr">  datasource:</span></span><br><span class="line"><span class="attr">    url:</span> <span class="attr">jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=UTF-8</span></span><br><span class="line"><span class="attr">    username:</span> <span class="string">ENC(CJ0EN4egw8l1k6aCtr9JMA==)</span></span><br><span class="line"><span class="attr">    password:</span> <span class="number">123456</span></span><br><span class="line"><span class="attr">    driver-class-name:</span> <span class="string">com.mysql.cj.jdbc.Driver</span></span><br></pre></td></tr></table></figure>
+
+<p>加密后的配置值需要使用 ENC 进行包括，这样 jasypt 才会识别出该值是一个密文，需要进行解密操作。</p>
+<p>项目的 github 地址：<a href="https://github.com/qchery/funda" target="_blank" rel="noopener">https://github.com/qchery/funda</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="qchery wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    qchery
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://qchery.github.io/2017/04/29/SpringBoot实战之外部配置篇/" title="SpringBoot实战之外部配置篇">http://qchery.github.io/2017/04/29/SpringBoot实战之外部配置篇/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/实战/" rel="tag"># 实战</a>
+          
+            <a href="/tags/Configuration/" rel="tag"># Configuration</a>
+          
+            <a href="/tags/properties/" rel="tag"># properties</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/28/SpringBoot实战之数据交互篇/" rel="next" title="SpringBoot实战之数据交互篇">
+                <i class="fa fa-chevron-left"></i> SpringBoot实战之数据交互篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/01/SpringBoot实战之异常处理篇/" rel="prev" title="SpringBoot实战之异常处理篇">
+                SpringBoot实战之异常处理篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qchery</p>
+              <p class="site-description motion-element" itemprop="description">一个金融IT的技术笔记</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/qchery" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:chinrui1016@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#配置注入"><span class="nav-number">1.</span> <span class="nav-text">配置注入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Value-注入"><span class="nav-number">1.1.</span> <span class="nav-text">@Value 注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ConfigurationProperties-注入"><span class="nav-number">1.2.</span> <span class="nav-text">@ConfigurationProperties 注入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-参数合法性校验"><span class="nav-number">1.3.</span> <span class="nav-text">1.3. 参数合法性校验</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#YAML-配置"><span class="nav-number">2.</span> <span class="nav-text">YAML 配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置分离"><span class="nav-number">3.</span> <span class="nav-text">配置分离</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Profile-的使用"><span class="nav-number">3.1.</span> <span class="nav-text">Profile 的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指定配置路径"><span class="nav-number">3.2.</span> <span class="nav-text">指定配置路径</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置加密"><span class="nav-number">4.</span> <span class="nav-text">配置加密</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qchery</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

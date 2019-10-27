@@ -98,7 +98,7 @@
 
 
 
-  <meta name="keywords" content="Spring,SpringMVC,源码,">
+  <meta name="keywords" content="源码,Spring,SpringMVC,">
 
 
 
@@ -110,7 +110,7 @@
 
 
 <meta name="description" content="Spring Web MVC是基于Servlet API构建的原始Web框架，从一开始就已包含在Spring框架中。 正式名称“Spring Web MVC”来自其源模块的名称（spring-webmvc），但它通常被称为“Spring MVC”。 与其他许多Web框架一样，Spring MVC围绕前端控制器模式进行设计，在该模式下，DispatcherServlet作为中央Servlet提供了用">
-<meta name="keywords" content="Spring,SpringMVC,源码">
+<meta name="keywords" content="源码,Spring,SpringMVC">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SpringMVC请求处理流程">
 <meta property="og:url" content="http://qchery.github.io/2019/10/21/SpringMVC请求处理流程/index.html">
@@ -118,7 +118,7 @@
 <meta property="og:description" content="Spring Web MVC是基于Servlet API构建的原始Web框架，从一开始就已包含在Spring框架中。 正式名称“Spring Web MVC”来自其源模块的名称（spring-webmvc），但它通常被称为“Spring MVC”。 与其他许多Web框架一样，Spring MVC围绕前端控制器模式进行设计，在该模式下，DispatcherServlet作为中央Servlet提供了用">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/21/SpringMVC%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png">
-<meta property="og:updated_time" content="2019-10-22T14:14:51.000Z">
+<meta property="og:updated_time" content="2019-10-27T14:22:25.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SpringMVC请求处理流程">
 <meta name="twitter:description" content="Spring Web MVC是基于Servlet API构建的原始Web框架，从一开始就已包含在Spring框架中。 正式名称“Spring Web MVC”来自其源模块的名称（spring-webmvc），但它通常被称为“Spring MVC”。 与其他许多Web框架一样，Spring MVC围绕前端控制器模式进行设计，在该模式下，DispatcherServlet作为中央Servlet提供了用">
@@ -350,30 +350,9 @@
 
           
             
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2019/10/21/SpringMVC请求处理流程/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/10/21/SpringMVC请求处理流程/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
           
 
           
-          
-             <span id="/2019/10/21/SpringMVC请求处理流程/" class="leancloud_visitors" data-flag-title="SpringMVC请求处理流程">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数&#58;</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
           
 
           
@@ -399,7 +378,7 @@
 <p>与其他许多Web框架一样，Spring MVC围绕前端控制器模式进行设计，在该模式下，<code>DispatcherServlet</code>作为中央<code>Servlet</code>提供了用于请求处理的共享算法，而实际工作是由可配置的委托组件执行的。该模型非常灵活，并支持多种工作流程。</p>
 <a id="more"></a>
 
-<p><code>DispatcherServlet</code> 处理请求的核心逻辑入口为 <code>doDispatch()</code> 方法，下面是该方法及其部分依赖方法的实现</p>
+<h2 id="主体流程分析"><a href="#主体流程分析" class="headerlink" title="主体流程分析"></a>主体流程分析</h2><p><code>DispatcherServlet</code> 处理请求的核心逻辑入口为 <code>doDispatch()</code> 方法，下面是该方法及其部分依赖方法的实现</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doDispatch</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    HttpServletRequest processedRequest = request;</span><br><span class="line">    HandlerExecutionChain mappedHandler = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">boolean</span> multipartRequestParsed = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        ModelAndView mv = <span class="keyword">null</span>;</span><br><span class="line">        Exception dispatchException = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 检查请求是否为 Multipart 请求，若是则进行请求转换</span></span><br><span class="line">            processedRequest = checkMultipart(request);</span><br><span class="line">            multipartRequestParsed = (processedRequest != request);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 确定当前请求的处理程序</span></span><br><span class="line">            mappedHandler = getHandler(processedRequest);</span><br><span class="line">            <span class="keyword">if</span> (mappedHandler == <span class="keyword">null</span> || mappedHandler.getHandler() == <span class="keyword">null</span>) &#123;</span><br><span class="line">                noHandlerFound(processedRequest, response);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 确定当前请求处理程序适配器</span></span><br><span class="line">            HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());</span><br><span class="line"></span><br><span class="line">            ... ...</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 调用拦截器的 preHandle 方法</span></span><br><span class="line">            <span class="keyword">if</span> (!mappedHandler.applyPreHandle(processedRequest, response)) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 实际调用处理程序</span></span><br><span class="line">            mv = ha.handle(processedRequest, response, mappedHandler.getHandler());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (asyncManager.isConcurrentHandlingStarted()) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            applyDefaultViewName(processedRequest, mv);</span><br><span class="line">            <span class="comment">// 调用拦截器的 postHandle 方法</span></span><br><span class="line">            mappedHandler.applyPostHandle(processedRequest, response, mv);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">            dispatchException = ex;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Throwable err) &#123;</span><br><span class="line">            <span class="comment">// As of 4.3, we're processing Errors thrown from handler methods as well,</span></span><br><span class="line">            <span class="comment">// making them available for @ExceptionHandler methods and other scenarios.</span></span><br><span class="line">            dispatchException = <span class="keyword">new</span> NestedServletException(<span class="string">"Handler dispatch failed"</span>, err);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 处理请求结果，并调用拦截器的 triggerAfterCompletion 方法</span></span><br><span class="line">        processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ... ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processDispatchResult</span><span class="params">(HttpServletRequest request, HttpServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">        HandlerExecutionChain mappedHandler, ModelAndView mv, Exception exception)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> errorView = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Did the handler return a view to render?</span></span><br><span class="line">    <span class="keyword">if</span> (mv != <span class="keyword">null</span> &amp;&amp; !mv.wasCleared()) &#123;</span><br><span class="line">        render(mv, request, response);</span><br><span class="line">        <span class="keyword">if</span> (errorView) &#123;</span><br><span class="line">            WebUtils.clearErrorRequestAttributes(request);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ... ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (mappedHandler != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 调用拦截器的 afterCompletion 方法</span></span><br><span class="line">        mappedHandler.triggerAfterCompletion(request, response, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">render</span><span class="params">(ModelAndView mv, HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// 确定请求的语言环境并将其应用于响应</span></span><br><span class="line">    Locale locale = <span class="keyword">this</span>.localeResolver.resolveLocale(request);</span><br><span class="line">    response.setLocale(locale);</span><br><span class="line"></span><br><span class="line">    View view;</span><br><span class="line">    <span class="keyword">if</span> (mv.isReference()) &#123;</span><br><span class="line">        <span class="comment">// 解析视图名称</span></span><br><span class="line">        view = resolveViewName(mv.getViewName(), mv.getModelInternal(), locale, request);</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// No need to lookup: the ModelAndView object contains the actual View object.</span></span><br><span class="line">        view = mv.getView();</span><br><span class="line">        ... ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 委托给View对象进行渲染</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (mv.getStatus() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            response.setStatus(mv.getStatus().value());</span><br><span class="line">        &#125;</span><br><span class="line">        view.render(mv.getModelInternal(), request, response);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ex;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">protected</span> View <span class="title">resolveViewName</span><span class="params">(String viewName, Map&lt;String, Object&gt; model, Locale locale,</span></span></span><br><span class="line"><span class="function"><span class="params">        HttpServletRequest request)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// 使用已注册的视图解析器进行视图解析</span></span><br><span class="line">    <span class="keyword">for</span> (ViewResolver viewResolver : <span class="keyword">this</span>.viewResolvers) &#123;</span><br><span class="line">        View view = viewResolver.resolveViewName(viewName, locale);</span><br><span class="line">        <span class="keyword">if</span> (view != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> view;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>为子节约篇幅，对部分代码进行了删减，主要包括文件处理、异常处理、异步处理，这里只讨论普通的正常流程，整个流程可以分为如下几个步骤：</p>
@@ -414,7 +393,15 @@
 </ol>
 <p>整个调用流程的时序图如下：</p>
 <p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201910/21/SpringMVC%E8%AF%B7%E6%B1%82%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.png" alt="SpringMVC请求处理流程"></p>
+<h2 id="常用扩展点"><a href="#常用扩展点" class="headerlink" title="常用扩展点"></a>常用扩展点</h2><p>对于 SpringMVC，了解主体流程是远远不够的，一旦需要增加某些特性功能时，可能会很迷茫。比如：如何做全局的异常处理？如何对所有 Restful 请求进行日志记录？有可能你会说，我可以自定义一个切面进行拦截。那你是不是要新定义一套规范，让所有人按照既定规范来实现？还是说定义一个注解，每个接口自行标注？无论哪种实现都显得太复杂，不够优雅。实际上，如果你了解 SpringMVC 请求流程中预留的扩展点，这些问题都非常简单。</p>
+<h3 id="HandlerInterceptor"><a href="#HandlerInterceptor" class="headerlink" title="HandlerInterceptor"></a>HandlerInterceptor</h3><p><code>HandlerInterceptor</code>基本上类似于Servlet过滤器，但与后者相比，它仅允许自定义预处理以及禁止执行处理程序本身和自定义后处理的选项。通常用作授权检测，具体的触发节点在上述主体流程中已明确指出，可自行参考。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HandlerInterceptor</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 在实际Handler调用之前执行</span></span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">            </span><br><span class="line">    <span class="comment">// 在实际Handler调用之后执行</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">postHandle</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">            </span><br><span class="line">    <span class="comment">// 在请求完成之后执行</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">afterCompletion</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> Exception</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<h3 id="HandlerExceptionResolver"><a href="#HandlerExceptionResolver" class="headerlink" title="HandlerExceptionResolver"></a>HandlerExceptionResolver</h3><p>在 SpringMVC 处理请求映射或者实际调用 <code>Controller</code> 的过程中，如果发生异常，会将异常委托给一组 <code>HandlerExceptionResolver</code> 来处理，通常会给前端返回一个错误响应。</p>
+<p>具体的代码实现在 <code>DispatcherServlet</code> 的 <code>processHandlerException()</code> 方法里面，逻辑如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> ModelAndView <span class="title">processHandlerException</span><span class="params">(HttpServletRequest request, HttpServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">        Object handler, Exception ex)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查已注册的 HandlerExceptionResolvers...</span></span><br><span class="line">    ModelAndView exMv = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (HandlerExceptionResolver handlerExceptionResolver : <span class="keyword">this</span>.handlerExceptionResolvers) &#123;</span><br><span class="line">        exMv = handlerExceptionResolver.resolveException(request, response, handler, ex);</span><br><span class="line">        <span class="keyword">if</span> (exMv != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (exMv != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (exMv.isEmpty()) &#123;</span><br><span class="line">            request.setAttribute(EXCEPTION_ATTRIBUTE, ex);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// We might still need view name translation for a plain error model...</span></span><br><span class="line">        <span class="keyword">if</span> (!exMv.hasView()) &#123;</span><br><span class="line">            exMv.setViewName(getDefaultViewName(request));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">            logger.debug(<span class="string">"Handler execution resulted in exception - forwarding to resolved error view: "</span> + exMv, ex);</span><br><span class="line">        &#125;</span><br><span class="line">        WebUtils.exposeErrorRequestAttributes(request, ex, getServletName());</span><br><span class="line">        <span class="keyword">return</span> exMv;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> ex;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="InitBinider"><a href="#InitBinider" class="headerlink" title="@InitBinider"></a>@InitBinider</h3><h3 id="ModelAttribute"><a href="#ModelAttribute" class="headerlink" title="@ModelAttribute"></a>@ModelAttribute</h3><h3 id="ControllerAdvice"><a href="#ControllerAdvice" class="headerlink" title="ControllerAdvice"></a>ControllerAdvice</h3><h3 id="RequestBodyAdvice-ResponseBodyAdvice"><a href="#RequestBodyAdvice-ResponseBodyAdvice" class="headerlink" title="RequestBodyAdvice/ResponseBodyAdvice"></a>RequestBodyAdvice/ResponseBodyAdvice</h3>
       
     </div>
     
@@ -457,11 +444,11 @@
       
         <div class="post-tags">
           
+            <a href="/tags/源码/" rel="tag"># 源码</a>
+          
             <a href="/tags/Spring/" rel="tag"># Spring</a>
           
             <a href="/tags/SpringMVC/" rel="tag"># SpringMVC</a>
-          
-            <a href="/tags/源码/" rel="tag"># 源码</a>
           
         </div>
       
@@ -516,9 +503,6 @@
           
 
   
-    <div class="comments" id="comments">
-    </div>
-  
 
 
 
@@ -541,8 +525,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -557,7 +550,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">11</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -579,7 +572,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-count">31</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -618,6 +611,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#主体流程分析"><span class="nav-number">1.</span> <span class="nav-text">主体流程分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常用扩展点"><span class="nav-number">2.</span> <span class="nav-text">常用扩展点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerInterceptor"><span class="nav-number">2.1.</span> <span class="nav-text">HandlerInterceptor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HandlerExceptionResolver"><span class="nav-number">2.2.</span> <span class="nav-text">HandlerExceptionResolver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InitBinider"><span class="nav-number">2.3.</span> <span class="nav-text">@InitBinider</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ModelAttribute"><span class="nav-number">2.4.</span> <span class="nav-text">@ModelAttribute</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ControllerAdvice"><span class="nav-number">2.5.</span> <span class="nav-text">ControllerAdvice</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestBodyAdvice-ResponseBodyAdvice"><span class="nav-number">2.6.</span> <span class="nav-text">RequestBodyAdvice/ResponseBodyAdvice</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -808,28 +817,6 @@
 
 
 
-  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
-  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
-  
-  <script type="text/javascript">
-    var GUEST = ['nick','mail','link'];
-    var guest = 'nick,mail,link';
-    guest = guest.split(',').filter(item=>{
-      return GUEST.indexOf(item)>-1;
-    });
-    new Valine({
-        el: '#comments' ,
-        verify: false,
-        notify: false,
-        appId: 'EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz',
-        appKey: 'WrkItEsXn8is88v2tvi0mwbg',
-        placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!',
-        avatar:'mp',
-        guest_info:guest,
-        pageSize:'10' || 10,
-    });
-  </script>
-
 
 
   
@@ -839,113 +826,6 @@
 
 
   
-
-  
-  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
-  <script>AV.initialize("EUVfECHgEUsLjK6XUaMTtNrl-gzGzoHsz", "WrkItEsXn8is88v2tvi0mwbg");</script>
-  <script>
-    function showTime(Counter) {
-      var query = new AV.Query(Counter);
-      var entries = [];
-      var $visitors = $(".leancloud_visitors");
-
-      $visitors.each(function () {
-        entries.push( $(this).attr("id").trim() );
-      });
-
-      query.containedIn('url', entries);
-      query.find()
-        .done(function (results) {
-          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
-
-          if (results.length === 0) {
-            $visitors.find(COUNT_CONTAINER_REF).text(0);
-            return;
-          }
-
-          for (var i = 0; i < results.length; i++) {
-            var item = results[i];
-            var url = item.get('url');
-            var time = item.get('time');
-            var element = document.getElementById(url);
-
-            $(element).find(COUNT_CONTAINER_REF).text(time);
-          }
-          for(var i = 0; i < entries.length; i++) {
-            var url = entries[i];
-            var element = document.getElementById(url);
-            var countSpan = $(element).find(COUNT_CONTAINER_REF);
-            if( countSpan.text() == '') {
-              countSpan.text(0);
-            }
-          }
-        })
-        .fail(function (object, error) {
-          console.log("Error: " + error.code + " " + error.message);
-        });
-    }
-
-    function addCount(Counter) {
-      var $visitors = $(".leancloud_visitors");
-      var url = $visitors.attr('id').trim();
-      var title = $visitors.attr('data-flag-title').trim();
-      var query = new AV.Query(Counter);
-
-      query.equalTo("url", url);
-      query.find({
-        success: function(results) {
-          if (results.length > 0) {
-            var counter = results[0];
-            counter.fetchWhenSave(true);
-            counter.increment("time");
-            counter.save(null, {
-              success: function(counter) {
-                var $element = $(document.getElementById(url));
-                $element.find('.leancloud-visitors-count').text(counter.get('time'));
-              },
-              error: function(counter, error) {
-                console.log('Failed to save Visitor num, with error message: ' + error.message);
-              }
-            });
-          } else {
-            var newcounter = new Counter();
-            /* Set ACL */
-            var acl = new AV.ACL();
-            acl.setPublicReadAccess(true);
-            acl.setPublicWriteAccess(true);
-            newcounter.setACL(acl);
-            /* End Set ACL */
-            newcounter.set("title", title);
-            newcounter.set("url", url);
-            newcounter.set("time", 1);
-            newcounter.save(null, {
-              success: function(newcounter) {
-                var $element = $(document.getElementById(url));
-                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
-              },
-              error: function(newcounter, error) {
-                console.log('Failed to create');
-              }
-            });
-          }
-        },
-        error: function(error) {
-          console.log('Error:' + error.code + " " + error.message);
-        }
-      });
-    }
-
-    $(function() {
-      var Counter = AV.Object.extend("Counter");
-      if ($('.leancloud_visitors').length == 1) {
-        addCount(Counter);
-      } else if ($('.post-title-link').length > 1) {
-        showTime(Counter);
-      }
-    });
-  </script>
-
-
 
   
 

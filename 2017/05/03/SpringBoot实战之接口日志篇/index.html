@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next gemini" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Fira Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="SpringBoot,实战,接口日志,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="在本篇文章中不会详细介绍日志如何配置、如果切换另外一种日志工具之类的内容，只用于记录作者本人在工作过程中对日志的几种处理方式。 Debug 日志管理在开发的过程中，总会遇到各种莫名其妙的问题，而这些问题的定位一般会使用到两种方式，第一种是通过手工 Debug 代码，第二种则是直接查看日志输出。Debug 代码这种方式只能在 IDE 下使用，一旦程序移交部署，就只能通过日志来跟踪定位了。 在测试环境">
+<meta name="keywords" content="SpringBoot,实战,接口日志">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot实战之接口日志篇">
+<meta property="og:url" content="http://qchery.github.io/2017/05/03/SpringBoot实战之接口日志篇/index.html">
+<meta property="og:site_name" content="Q码记">
+<meta property="og:description" content="在本篇文章中不会详细介绍日志如何配置、如果切换另外一种日志工具之类的内容，只用于记录作者本人在工作过程中对日志的几种处理方式。 Debug 日志管理在开发的过程中，总会遇到各种莫名其妙的问题，而这些问题的定位一般会使用到两种方式，第一种是通过手工 Debug 代码，第二种则是直接查看日志输出。Debug 代码这种方式只能在 IDE 下使用，一旦程序移交部署，就只能通过日志来跟踪定位了。 在测试环境">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-27T14:22:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringBoot实战之接口日志篇">
+<meta name="twitter:description" content="在本篇文章中不会详细介绍日志如何配置、如果切换另外一种日志工具之类的内容，只用于记录作者本人在工作过程中对日志的几种处理方式。 Debug 日志管理在开发的过程中，总会遇到各种莫名其妙的问题，而这些问题的定位一般会使用到两种方式，第一种是通过手工 Debug 代码，第二种则是直接查看日志输出。Debug 代码这种方式只能在 IDE 下使用，一旦程序移交部署，就只能通过日志来跟踪定位了。 在测试环境">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://qchery.github.io/2017/05/03/SpringBoot实战之接口日志篇/">
+
+
+
+
+
+  <title>SpringBoot实战之接口日志篇 | Q码记</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Q码记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">崇尚专注，乐于分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://qchery.github.io/2017/05/03/SpringBoot实战之接口日志篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qchery">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Q码记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SpringBoot实战之接口日志篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-03T21:54:28+08:00">
+                2017-05-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在本篇文章中不会详细介绍日志如何配置、如果切换另外一种日志工具之类的内容，只用于记录作者本人在工作过程中对日志的几种处理方式。</p>
+<h2 id="Debug-日志管理"><a href="#Debug-日志管理" class="headerlink" title="Debug 日志管理"></a>Debug 日志管理</h2><p>在开发的过程中，总会遇到各种莫名其妙的问题，而这些问题的定位一般会使用到两种方式，第一种是通过手工 Debug 代码，第二种则是直接查看日志输出。Debug 代码这种方式只能在 IDE 下使用，一旦程序移交部署，就只能通过日志来跟踪定位了。</p>
+<p>在测试环境下，我们无法使用 Debug 代码来定位问题，所以这时候需要记录所有请求的参数及对应的响应报文。而在 <a href="https://qchery.github.io/2017/04/28/SpringBoot%E5%AE%9E%E6%88%98%E4%B9%8B%E6%95%B0%E6%8D%AE%E4%BA%A4%E4%BA%92%E7%AF%87/">数据交互篇</a> 中，我们将请求及响应的格式都定义成了Json，而且传输的数据还是存放在请求体里面。而请求体对应在 <code>HttpServletRequest</code> 里面又只是一个输入流，这样的话，就无法在过滤器或者拦截器里面去做日志记录了，而必须要等待输入流转换成请求模型后（响应对象转换成输出流前）做数据日志输出。</p>
+<a id="more"></a>
+
+<p>有目标那就好办了，只需要找到转换发生的地方就可以植入我们的日志了。通过源码的阅读，终于在 <code>AbstractMessageConverterMethodArgumentResolver</code> 个类中发现了我们的期望的那个地方，对于请求模型的转换，实现代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line"><span class="keyword">protected</span> &lt;T&gt; <span class="function">Object <span class="title">readWithMessageConverters</span><span class="params">(HttpInputMessage inputMessage, MethodParameter parameter,</span></span></span><br><span class="line"><span class="function"><span class="params">        Type targetType)</span> <span class="keyword">throws</span> IOException, HttpMediaTypeNotSupportedException, HttpMessageNotReadableException </span>&#123;</span><br><span class="line"></span><br><span class="line">    MediaType contentType;</span><br><span class="line">    <span class="keyword">boolean</span> noContentType = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        contentType = inputMessage.getHeaders().getContentType();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (InvalidMediaTypeException ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> HttpMediaTypeNotSupportedException(ex.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (contentType == <span class="keyword">null</span>) &#123;</span><br><span class="line">        noContentType = <span class="keyword">true</span>;</span><br><span class="line">        contentType = MediaType.APPLICATION_OCTET_STREAM;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt; contextClass = (parameter != <span class="keyword">null</span> ? parameter.getContainingClass() : <span class="keyword">null</span>);</span><br><span class="line">    Class&lt;T&gt; targetClass = (targetType <span class="keyword">instanceof</span> Class ? (Class&lt;T&gt;) targetType : <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">if</span> (targetClass == <span class="keyword">null</span>) &#123;</span><br><span class="line">        ResolvableType resolvableType = (parameter != <span class="keyword">null</span> ?</span><br><span class="line">                ResolvableType.forMethodParameter(parameter) : ResolvableType.forType(targetType));</span><br><span class="line">        targetClass = (Class&lt;T&gt;) resolvableType.resolve();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    HttpMethod httpMethod = ((HttpRequest) inputMessage).getMethod();</span><br><span class="line">    Object body = NO_VALUE;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        inputMessage = <span class="keyword">new</span> EmptyBodyCheckingHttpInputMessage(inputMessage);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (HttpMessageConverter&lt;?&gt; converter : <span class="keyword">this</span>.messageConverters) &#123;</span><br><span class="line">            Class&lt;HttpMessageConverter&lt;?&gt;&gt; converterType = (Class&lt;HttpMessageConverter&lt;?&gt;&gt;) converter.getClass();</span><br><span class="line">            <span class="keyword">if</span> (converter <span class="keyword">instanceof</span> GenericHttpMessageConverter) &#123;</span><br><span class="line">                GenericHttpMessageConverter&lt;?&gt; genericConverter = (GenericHttpMessageConverter&lt;?&gt;) converter;</span><br><span class="line">                <span class="keyword">if</span> (genericConverter.canRead(targetType, contextClass, contentType)) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">                        logger.debug(<span class="string">"Read ["</span> + targetType + <span class="string">"] as \""</span> + contentType + <span class="string">"\" with ["</span> + converter + <span class="string">"]"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (inputMessage.getBody() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        inputMessage = getAdvice().beforeBodyRead(inputMessage, parameter, targetType, converterType);</span><br><span class="line">                        body = genericConverter.read(targetType, contextClass, inputMessage);</span><br><span class="line">                        body = getAdvice().afterBodyRead(body, inputMessage, parameter, targetType, converterType);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> &#123;</span><br><span class="line">                        body = getAdvice().handleEmptyBody(<span class="keyword">null</span>, inputMessage, parameter, targetType, converterType);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (targetClass != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (converter.canRead(targetClass, contentType)) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">                        logger.debug(<span class="string">"Read ["</span> + targetType + <span class="string">"] as \""</span> + contentType + <span class="string">"\" with ["</span> + converter + <span class="string">"]"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (inputMessage.getBody() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                        inputMessage = getAdvice().beforeBodyRead(inputMessage, parameter, targetType, converterType);</span><br><span class="line">                        body = ((HttpMessageConverter&lt;T&gt;) converter).read(targetClass, inputMessage);</span><br><span class="line">                        body = getAdvice().afterBodyRead(body, inputMessage, parameter, targetType, converterType);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> &#123;</span><br><span class="line">                        body = getAdvice().handleEmptyBody(<span class="keyword">null</span>, inputMessage, parameter, targetType, converterType);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (IOException ex) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> HttpMessageNotReadableException(<span class="string">"Could not read document: "</span> + ex.getMessage(), ex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (body == NO_VALUE) &#123;</span><br><span class="line">        <span class="keyword">if</span> (httpMethod == <span class="keyword">null</span> || !SUPPORTED_METHODS.contains(httpMethod) ||</span><br><span class="line">                (noContentType &amp;&amp; inputMessage.getBody() == <span class="keyword">null</span>)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> HttpMediaTypeNotSupportedException(contentType, <span class="keyword">this</span>.allSupportedMediaTypes);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> body;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码中有一处非常重要的地方，那就在在数据转换前后都存在 <code>Advice</code> 相关的方法调用，显然，只需要在 <code>Advice</code> 里面完成日志记录就可以了，下面开始实现自定义 <code>Advice</code>。</p>
+<p>首先，请求体日志切面 <code>LogRequestBodyAdvice</code> 实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ControllerAdvice</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LogRequestBodyAdvice</span> <span class="keyword">implements</span> <span class="title">RequestBodyAdvice</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(LogRequestBodyAdvice.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">supports</span><span class="params">(MethodParameter methodParameter, Type targetType,</span></span></span><br><span class="line"><span class="function"><span class="params">                            Class&lt;? extends HttpMessageConverter&lt;?&gt;&gt; converterType)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">handleEmptyBody</span><span class="params">(Object body, HttpInputMessage inputMessage,</span></span></span><br><span class="line"><span class="function"><span class="params">                                  MethodParameter parameter, Type targetType,</span></span></span><br><span class="line"><span class="function"><span class="params">                                  Class&lt;? extends HttpMessageConverter&lt;?&gt;&gt; converterType)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> body;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> HttpInputMessage <span class="title">beforeBodyRead</span><span class="params">(HttpInputMessage inputMessage,</span></span></span><br><span class="line"><span class="function"><span class="params">                                           MethodParameter parameter, Type targetType,</span></span></span><br><span class="line"><span class="function"><span class="params">                                           Class&lt;? extends HttpMessageConverter&lt;?&gt;&gt; converterType)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> inputMessage;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">afterBodyRead</span><span class="params">(Object body, HttpInputMessage inputMessage,</span></span></span><br><span class="line"><span class="function"><span class="params">                                MethodParameter parameter, Type targetType,</span></span></span><br><span class="line"><span class="function"><span class="params">                                Class&lt;? extends HttpMessageConverter&lt;?&gt;&gt; converterType)</span> </span>&#123;</span><br><span class="line">        Method method = parameter.getMethod();</span><br><span class="line">        String classMappingUri = getClassMappingUri(method.getDeclaringClass());</span><br><span class="line">        String methodMappingUri = getMethodMappingUri(method);</span><br><span class="line">        <span class="keyword">if</span> (!methodMappingUri.startsWith(<span class="string">"/"</span>)) &#123;</span><br><span class="line">            methodMappingUri = <span class="string">"/"</span> + methodMappingUri;</span><br><span class="line">        &#125;</span><br><span class="line">        logger.debug(<span class="string">"uri=&#123;&#125; | requestBody=&#123;&#125;"</span>, classMappingUri + methodMappingUri, JSON.toJSONString(body));</span><br><span class="line">        <span class="keyword">return</span> body;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getMethodMappingUri</span><span class="params">(Method method)</span> </span>&#123;</span><br><span class="line">        RequestMapping methodDeclaredAnnotation = method.getDeclaredAnnotation(RequestMapping.class);</span><br><span class="line">        <span class="keyword">return</span> methodDeclaredAnnotation == <span class="keyword">null</span> ? <span class="string">""</span> : getMaxLength(methodDeclaredAnnotation.value());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getClassMappingUri</span><span class="params">(Class&lt;?&gt; declaringClass)</span> </span>&#123;</span><br><span class="line">        RequestMapping classDeclaredAnnotation = declaringClass.getDeclaredAnnotation(RequestMapping.class);</span><br><span class="line">        <span class="keyword">return</span> classDeclaredAnnotation == <span class="keyword">null</span> ? <span class="string">""</span> : getMaxLength(classDeclaredAnnotation.value());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> String <span class="title">getMaxLength</span><span class="params">(String[] strings)</span> </span>&#123;</span><br><span class="line">        String methodMappingUri = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">for</span> (String string : strings) &#123;</span><br><span class="line">            <span class="keyword">if</span> (string.length() &gt; methodMappingUri.length()) &#123;</span><br><span class="line">                methodMappingUri = string;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> methodMappingUri;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到日志记录如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2017-05-02 22:48:15.435 DEBUG 888 --- [nio-8080-exec-1] c.q.funda.advice.LogRequestBodyAdvice    : uri=/sys/user/login | requestBody=&#123;&quot;password&quot;:&quot;123&quot;,&quot;username&quot;:&quot;123&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对应的，响应体日志切面 <code>LogResponseBodyAdvice</code> 实现如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ControllerAdvice</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LogResponseBodyAdvice</span> <span class="keyword">implements</span> <span class="title">ResponseBodyAdvice</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(LogResponseBodyAdvice.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">supports</span><span class="params">(MethodParameter returnType, Class converterType)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">beforeBodyWrite</span><span class="params">(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response)</span> </span>&#123;</span><br><span class="line">        logger.debug(<span class="string">"uri=&#123;&#125; | responseBody=&#123;&#125;"</span>, request.getURI().getPath(), JSON.toJSONString(body));</span><br><span class="line">        <span class="keyword">return</span> body;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到日志记录如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2017-05-02 22:48:15.520 DEBUG 888 --- [nio-8080-exec-1] c.q.funda.advice.LogResponseBodyAdvice   : uri=/sys/user/login | responseBody=&#123;&quot;code&quot;:10101,&quot;msg&quot;:&quot;手机号格式不合法&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="异常日志管理"><a href="#异常日志管理" class="headerlink" title="异常日志管理"></a>异常日志管理</h2><p>Debug 日志只适用于开发及测试阶段，一般应用部署生产，鉴于日志里面的敏感信息过多，往往只会在程序出现异常时输出明细的日志信息，在 <code>ExceptionHandler</code> 标注的方法里面输入异常日志无疑是最好的，但摆在面前的一个问题是，如何将 <code>@RequestBody</code> 绑定的 <code>Model</code> 传递给异常处理方法？我想到的是通过 <code>ThreadLocal</code> 这个线程本地变量来存储每一次请求的 <code>Model</code>，这样就可以贯穿整个请求处理流程，下面使用 <code>ThreadLocal</code> 来协助完成异常日志的记录。</p>
+<p>在绑定时，将绑定 <code>Model</code> 有存放到 <code>ThreadLocal</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/sys/user"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;Object&gt; MODEL_HOLDER = <span class="keyword">new</span> ThreadLocal&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@InitBinder</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initBinder</span><span class="params">(WebDataBinder webDataBinder)</span> </span>&#123;</span><br><span class="line">        MODEL_HOLDER.set(webDataBinder.getTarget());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>异常处理时，从 <code>ThreadLocal</code> 中取出变量，并做相应的日志输出：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ControllerAdvice</span></span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ExceptionHandlerAdvice</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(ExceptionHandlerAdvice.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ExceptionHandler</span>(Exception.class)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Result <span class="title">handleException</span><span class="params">(Exception e, HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">        logger.error(<span class="string">"uri=&#123;&#125; | requestBody=&#123;&#125;"</span>, request.getRequestURI(),</span><br><span class="line">                JSON.toJSONString(UserController.MODEL_HOLDER.get()));</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result(ResultCode.WEAK_NET_WORK);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当异常产生时，输出日志如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2017-05-03 21:46:07.177 ERROR 633 --- [nio-8080-exec-1] c.q.funda.advice.ExceptionHandlerAdvice  : uri=/sys/user/login | requestBody=&#123;&quot;password&quot;:&quot;123&quot;,&quot;username&quot;:&quot;13632672222&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong>当 <code>Mapping</code> 方法中带有多个参数时，需要将 <code>@RequestBody</code> 绑定的变量当作方法的最后一个参数，否则 <code>ThreadLocal</code> 中的值将会被其它值所替换。如果需要输出 <code>Mapping</code> 方法中所有参数，可以在 <code>ThreadLocal</code> 里面存放一个 <code>Map</code> 集合。</p>
+<p>项目的 github 地址：<a href="https://github.com/qchery/funda" target="_blank" rel="noopener">https://github.com/qchery/funda</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="qchery wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    qchery
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://qchery.github.io/2017/05/03/SpringBoot实战之接口日志篇/" title="SpringBoot实战之接口日志篇">http://qchery.github.io/2017/05/03/SpringBoot实战之接口日志篇/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SpringBoot/" rel="tag"># SpringBoot</a>
+          
+            <a href="/tags/实战/" rel="tag"># 实战</a>
+          
+            <a href="/tags/接口日志/" rel="tag"># 接口日志</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/01/SpringBoot实战之异常处理篇/" rel="next" title="SpringBoot实战之异常处理篇">
+                <i class="fa fa-chevron-left"></i> SpringBoot实战之异常处理篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/06/SpringBoot实战之数据库/" rel="prev" title="SpringBoot实战之数据库">
+                SpringBoot实战之数据库 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qchery</p>
+              <p class="site-description motion-element" itemprop="description">一个金融IT的技术笔记</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/qchery" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:chinrui1016@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Debug-日志管理"><span class="nav-number">1.</span> <span class="nav-text">Debug 日志管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常日志管理"><span class="nav-number">2.</span> <span class="nav-text">异常日志管理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qchery</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

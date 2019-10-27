@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+
+
+
+<html class="theme-next gemini" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic|Fira Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="SpringBoot,实战,RESTful,json,xml,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SpringBoot 非常适合 Web 应用开发，我们可以使用它轻松地建立一个 Web 服务。在Spring Boot入门 里面，我们已经使用其实现一个非常简单的接口，输出了 Hello World！下面我们模拟真实的场景来学习 SpringBoot 应用开发。 数据格式在实际的项目场景中，前后分离几乎是所以项目的标配，全栈的时代的逐渐远去，后端负责业务逻辑处理，前端负责数据展示成了一种固定的开发">
+<meta name="keywords" content="SpringBoot,实战,RESTful,json,xml">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot实战之数据交互篇">
+<meta property="og:url" content="http://qchery.github.io/2017/04/28/SpringBoot实战之数据交互篇/index.html">
+<meta property="og:site_name" content="Q码记">
+<meta property="og:description" content="SpringBoot 非常适合 Web 应用开发，我们可以使用它轻松地建立一个 Web 服务。在Spring Boot入门 里面，我们已经使用其实现一个非常简单的接口，输出了 Hello World！下面我们模拟真实的场景来学习 SpringBoot 应用开发。 数据格式在实际的项目场景中，前后分离几乎是所以项目的标配，全栈的时代的逐渐远去，后端负责业务逻辑处理，前端负责数据展示成了一种固定的开发">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/%E6%A8%A1%E6%8B%9F%E8%AF%B7%E6%B1%82.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Xml%E6%A8%A1%E6%8B%9F%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Json%E6%A8%A1%E6%8B%9F%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Json%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE%E8%A7%84%E8%8C%83.jpeg">
+<meta property="og:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Json%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C%E6%B5%8B%E8%AF%95.jpeg">
+<meta property="og:updated_time" content="2019-10-27T14:09:01.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringBoot实战之数据交互篇">
+<meta name="twitter:description" content="SpringBoot 非常适合 Web 应用开发，我们可以使用它轻松地建立一个 Web 服务。在Spring Boot入门 里面，我们已经使用其实现一个非常简单的接口，输出了 Hello World！下面我们模拟真实的场景来学习 SpringBoot 应用开发。 数据格式在实际的项目场景中，前后分离几乎是所以项目的标配，全栈的时代的逐渐远去，后端负责业务逻辑处理，前端负责数据展示成了一种固定的开发">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/%E6%A8%A1%E6%8B%9F%E8%AF%B7%E6%B1%82.jpeg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://qchery.github.io/2017/04/28/SpringBoot实战之数据交互篇/">
+
+
+
+
+
+  <title>SpringBoot实战之数据交互篇 | Q码记</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Q码记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">崇尚专注，乐于分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://qchery.github.io/2017/04/28/SpringBoot实战之数据交互篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="qchery">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Q码记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SpringBoot实战之数据交互篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-28T23:03:35+08:00">
+                2017-04-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>SpringBoot 非常适合 Web 应用开发，我们可以使用它轻松地建立一个 Web 服务。在<a href="https://qchery.github.io/2017/04/23/SpringBoot%E5%AE%9E%E6%88%98%E4%B9%8B%E5%85%A5%E9%97%A8%E7%AF%87/">Spring Boot入门</a> 里面，我们已经使用其实现一个非常简单的接口，输出了 Hello World！下面我们模拟真实的场景来学习 SpringBoot 应用开发。</p>
+<h1 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h1><p>在实际的项目场景中，前后分离几乎是所以项目的标配，全栈的时代的逐渐远去，后端负责业务逻辑处理，前端负责数据展示成了一种固定的开发模式。一般来说，在后端提供的数据接口中，可能会存在两种数据形式 Json 与 XML，具体会用到哪一种，往往会与公司的工程师文化相关。</p>
+<h2 id="Json-报文"><a href="#Json-报文" class="headerlink" title="Json 报文"></a>Json 报文</h2><p>对于 SpringBoot 来说 ，它默认会使用 Json 作为响应报文格式，我们用一个简单的例子做一下测试：</p>
+<p>首先，我们创建一个 UserController 用于处理前端的 Web 请求。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/sys/user"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"login"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Map&lt;String, String&gt; <span class="title">login</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Map&lt;String, String&gt; hashMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">"msg"</span>, <span class="string">"登录成功"</span>);</span><br><span class="line">        <span class="keyword">return</span> hashMap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
+
+<p>相信这个事例对于大多数使用过 SpringMVC 的人来说都不会陌生，定义一个简单的控制器及相当的映射，与通常返回 Url 的 Controller 不一样的是，我们这里使用了 <code>@ResponseBody</code> 注解，它表示此接口响应为纯数据，不带任何界面展示。请求对应的地址看到如下输出：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/%E6%A8%A1%E6%8B%9F%E8%AF%B7%E6%B1%82.jpeg" alt="模拟请求"></p>
+<p>很明显，我们得到了想要的结果，一个标准格式的 Json 字符串，是不是非常的简单。</p>
+<p>对于上面的代码来说，还可以做进一步的优化，由于所有的 Restful 接口都只是返回数据，所以我们可以直接在类级别上添加 <code>@ResponseBody</code> 注解。而大多数情况下，<code>@Controller</code> 与 <code>@ResponseBody</code> 又会一起使用，所以我们使用 <code>@RestController</code> 注解来替换掉它们，从而更加简洁地实现功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/sys/user"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"login"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Map&lt;String, String&gt; <span class="title">login</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Map&lt;String, String&gt; hashMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">"msg"</span>, <span class="string">"登录成功"</span>);</span><br><span class="line">        <span class="keyword">return</span> hashMap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Xml-报文"><a href="#Xml-报文" class="headerlink" title="Xml 报文"></a>Xml 报文</h2><p>大多数情况下，使用 Json 就可以满足我们的需求了，但仍然存在某些特定的场景需要使用到 XML 形式的报文，如：微信公众号开发。不过不用担心，切换成 XML 报文也只需要做轻微的改动，添加相关依赖如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.8.8"</span></span><br></pre></td></tr></table></figure>
+
+<p>然后就可以开始进行测试了，此处借助一个模拟 HTTP 请求工具（Postman）来协助我们测试该接口，使用方法就不多说了，直接上图：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Xml%E6%A8%A1%E6%8B%9F%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94.jpeg" alt="这里写图片描述"></p>
+<p>在上面的测试范例里，我们指定了 <code>Accept</code> 为 <code>text/xml</code>，这样 SpringBoot 就会返回 XML 形式的数据。</p>
+<h1 id="接口规范"><a href="#接口规范" class="headerlink" title="接口规范"></a>接口规范</h1><p>对于每一家公司来说，都会定义自己的数据规范，一个统一且标准的数据规范对于系统维护来说是非常重要的，也在很在程度上提升了开发效率。</p>
+<h2 id="响应报文规范"><a href="#响应报文规范" class="headerlink" title="响应报文规范"></a>响应报文规范</h2><p>一般来说，接口响应至少需要告诉使用方三项信息：状态码、描述、数据。其中，数据不是每个接口必须的，如果只是一个简单修改的动作，可能就没有必须返回数据了。下面我们定义一个 Result 类来封装我们的响应报文。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Result</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> code;</span><br><span class="line">    <span class="keyword">private</span> String msg;</span><br><span class="line">    <span class="keyword">private</span> Object data;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Result</span><span class="params">(ResultCode resultCode, Object data)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(resultCode);</span><br><span class="line">        <span class="keyword">this</span>.data = data;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Result</span><span class="params">(ResultCode resultCode)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.code = resultCode.getCode();</span><br><span class="line">        <span class="keyword">this</span>.msg = resultCode.getMsg();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同时，定义一个枚举类来维护我们的状态码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span>  ResultCode &#123;</span><br><span class="line"></span><br><span class="line">    SUCCESS(<span class="number">0</span>, <span class="string">"请求成功"</span>),</span><br><span class="line">    WARN(-<span class="number">1</span>, <span class="string">"网络异常，请稍后重试"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> code;</span><br><span class="line">    <span class="keyword">private</span> String msg;</span><br><span class="line"></span><br><span class="line">    ResultCode(<span class="keyword">int</span> code, String msg) &#123;</span><br><span class="line">        <span class="keyword">this</span>.msg = msg;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> code;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getMsg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> msg;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，我们的响应数据规范已基本建立。将上面代码中返回 Map 修改为返回 Result，按照指定规范返回数据，得到结果如下。</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Json%E6%A8%A1%E6%8B%9F%E8%AF%B7%E6%B1%82%E5%93%8D%E5%BA%94.jpeg" alt="Json模拟请求响应"></p>
+<h2 id="请求数据规范"><a href="#请求数据规范" class="headerlink" title="请求数据规范"></a>请求数据规范</h2><p>响应报文格式我们已经定义好了，那么请求数据我们如何接收呢？一般来说，请求与响应会使用相同的报文形式，即，如果响应为Json，那么请求也建议使用Json。如果想要为上面的登录请求添加输入参数，需要完成以下几步：</p>
+<p>首先，我们定义好用户实体：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String username;</span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后，直接在映射方法里面使用该实体进行参数接收，并将接收到的参数直接返回：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/sys/user"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"login"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Result <span class="title">login</span><span class="params">(@RequestBody User loginUser)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Result(ResultCode.SUCCESS, loginUser);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调出我们的Postman，填写正确的Url，选择POST方式发送请求，选择Body，将 Content-Type 设置成 application/json，填入 Json 格式的请求数据，点击 Send 即可得到如下结果。</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Json%E8%AF%B7%E6%B1%82%E6%95%B0%E6%8D%AE%E8%A7%84%E8%8C%83.jpeg" alt="Json请求数据规范"></p>
+<p>数据接收非常成功，但在上面的响应报文中，存在着了一个非常严重的问题，那就是用户的密码也随同用户信息一起返回给了客户端，显然这并不是一种正确的做法。我们需要对其进行一次过滤，由于 SpringBoot 默认使用 <code>Jackson</code> 作为 Json 序列化工具，如果想要过滤掉响应中的某些字段，只需在过滤字段对应的 get 方法上加上 <code>@JsonIgnore</code> 注解即可。但这样又会引发另外一个问题，那就是请求中的字段也被过滤掉了，对于这种问题，可以采用抽离请求参数模型的方式进行处理，即自定义一套参数接收的 Model，比如，接收用户登录的会使用 <code>UserModel</code> 来进行参数接收，这样使得请求参数模型与数据库映射实体完全分离，在一定程度上提升了系统的安全性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"login"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> Result <span class="title">login</span><span class="params">(@RequestBody UserModel userModel)</span> </span>&#123;</span><br><span class="line">    User user = <span class="keyword">new</span> User();</span><br><span class="line">    user.setUsername(userModel.getUsername());</span><br><span class="line">    user.setPassword(userModel.getPassword());</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Result(ResultCode.SUCCESS, user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>替换成 Model 对象后，我们就可以在数据库映射实体 <code>User</code> 上增加 <code>@JsonIgnore</code> 注解忽略该字段的序列化，而不影响请求参数的输入。</p>
+<h1 id="参数校验"><a href="#参数校验" class="headerlink" title="参数校验"></a>参数校验</h1><p>出于系统健壮性的考虑，一般来说，我们需要对所有的参数进行必要性校验，如：登录请求时，如果没有用户名，程序应该立即驳回该请求。上面请求参数模型（Model）的抽象也使得我们对数据校验更加方便，当然主要还是依赖于 SpringBoot 的 Validate 功能的强大支持。</p>
+<h2 id="简单参数校验"><a href="#简单参数校验" class="headerlink" title="简单参数校验"></a>简单参数校验</h2><p>对于登录接口来说，用户名与密码都是必输的，那么我们现在为其添加上对应的参数校验，无需 if-else 判断，简单的几个注解就可以帮助我们完成所有的工作。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"login"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> Result <span class="title">login</span><span class="params">(@RequestBody @Valid UserModel userModel)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">---</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserModel</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String username;</span><br><span class="line">    <span class="keyword">private</span> String password;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotBlank</span>(message = <span class="string">"用户名不能为空"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getUsername</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> username;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotBlank</span>(message = <span class="string">"密码不能为空"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getPassword</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> password;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的示例中，我们为请求参数的 Model 对象加上了 <code>@Valid</code> 注解，并在 Model 类中，对需要校验字段的 get 方法上添加相应的校验注解。效果如下：</p>
+<p><img src="https://raw.githubusercontent.com/qchery/graph-bed/master/201704/28/Json%E5%8F%82%E6%95%B0%E6%A0%A1%E9%AA%8C%E6%B5%8B%E8%AF%95.jpeg" alt="这里写图片描述"></p>
+<h2 id="复杂参数校验"><a href="#复杂参数校验" class="headerlink" title="复杂参数校验"></a>复杂参数校验</h2><h3 id="正则表达式校验"><a href="#正则表达式校验" class="headerlink" title="正则表达式校验"></a>正则表达式校验</h3><p>如果用户的登录名为手机号，那么就需要对登录名的格式做进一步的校验，下面使用正则表达式来校验手机号的合法性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@NotBlank</span>(message = <span class="string">"用户名不能为空"</span>)</span><br><span class="line"><span class="meta">@Pattern</span>(</span><br><span class="line">        regexp = <span class="string">"1(([38]\\d)|(5[^4&amp;&amp;\\d])|(4[579])|(7[0135678]))\\d&#123;8&#125;"</span>,</span><br><span class="line">        message = <span class="string">"手机号格式不合法"</span></span><br><span class="line">)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getUsername</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> username;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="自定义校验注解"><a href="#自定义校验注解" class="headerlink" title="自定义校验注解"></a>自定义校验注解</h3><p>在系统使用过程中，有很多地方需要对手机号的格式进行校验，如：注册、验证码发送等。但校验手机号的正则表达式又过于复杂，如果多处编写，一旦运营商增加某个号段，对程序的维护人员来说就是一个噩耗。这时，可以使用自定义校验注解来代替这些常用的校验。</p>
+<p>手机号校验实现类 <code>PhoneValidator</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PhoneValidator</span> <span class="keyword">implements</span> <span class="title">ConstraintValidator</span>&lt;<span class="title">Phone</span>, <span class="title">String</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Pattern pattern = Pattern.compile(<span class="string">"1(([38]\\d)|(5[^4&amp;&amp;\\d])|(4[579])|(7[0135678]))\\d&#123;8&#125;"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initialize</span><span class="params">(Phone phone)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isValid</span><span class="params">(String value, ConstraintValidatorContext constraintValidatorContext)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> pattern.matcher(value).matches();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>手机号校验注解 <code>Phone</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Constraint</span>(validatedBy = PhoneValidator.class)</span><br><span class="line"><span class="meta">@Target</span>(&#123;ElementType.METHOD, ElementType.FIELD&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Phone &#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">String <span class="title">message</span><span class="params">()</span> <span class="keyword">default</span> "手机号格式不合法"</span>;</span><br><span class="line"></span><br><span class="line">    Class&lt;?&gt;[] groups() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">    Class&lt;? extends Payload&gt;[] payload() <span class="keyword">default</span> &#123;&#125;;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Model 上的使用：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Phone</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getUsername</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> username;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样的话，如果因为某些不可抗拒因素导致校验规则的变动，只需要修改一处理即可，维护成本大大降低。</p>
+<p>项目的 github 地址：<a href="https://github.com/qchery/funda" target="_blank" rel="noopener">https://github.com/qchery/funda</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/uploads/wechat-qcode.jpg" alt="qchery wechat" style="width: 200px; max-width: 100%;">
+    <div>欢迎您扫一扫上面的微信公众号，订阅我的博客！</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者：</strong>
+    qchery
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://qchery.github.io/2017/04/28/SpringBoot实战之数据交互篇/" title="SpringBoot实战之数据交互篇">http://qchery.github.io/2017/04/28/SpringBoot实战之数据交互篇/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>
+    本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/3.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 3.0</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/SpringBoot/" rel="tag"># SpringBoot</a>
+          
+            <a href="/tags/实战/" rel="tag"># 实战</a>
+          
+            <a href="/tags/RESTful/" rel="tag"># RESTful</a>
+          
+            <a href="/tags/json/" rel="tag"># json</a>
+          
+            <a href="/tags/xml/" rel="tag"># xml</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/23/SpringBoot实战之入门篇/" rel="next" title="SpringBoot实战之入门篇">
+                <i class="fa fa-chevron-left"></i> SpringBoot实战之入门篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/29/SpringBoot实战之外部配置篇/" rel="prev" title="SpringBoot实战之外部配置篇">
+                SpringBoot实战之外部配置篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">qchery</p>
+              <p class="site-description motion-element" itemprop="description">一个金融IT的技术笔记</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/qchery" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:chinrui1016@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#数据格式"><span class="nav-number">1.</span> <span class="nav-text">数据格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Json-报文"><span class="nav-number">1.1.</span> <span class="nav-text">Json 报文</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Xml-报文"><span class="nav-number">1.2.</span> <span class="nav-text">Xml 报文</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#接口规范"><span class="nav-number">2.</span> <span class="nav-text">接口规范</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#响应报文规范"><span class="nav-number">2.1.</span> <span class="nav-text">响应报文规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求数据规范"><span class="nav-number">2.2.</span> <span class="nav-text">请求数据规范</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参数校验"><span class="nav-number">3.</span> <span class="nav-text">参数校验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#简单参数校验"><span class="nav-number">3.1.</span> <span class="nav-text">简单参数校验</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复杂参数校验"><span class="nav-number">3.2.</span> <span class="nav-text">复杂参数校验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#正则表达式校验"><span class="nav-number">3.2.1.</span> <span class="nav-text">正则表达式校验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义校验注解"><span class="nav-number">3.2.2.</span> <span class="nav-text">自定义校验注解</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">qchery</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
